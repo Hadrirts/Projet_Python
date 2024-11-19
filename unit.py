@@ -2,8 +2,8 @@ import pygame
 import random
 
 # Constantes
-GRID_SIZE = 8
-CELL_SIZE = 60
+GRID_SIZE = 8   # Nombre de cases
+CELL_SIZE = 60   # Taille d'une case
 WIDTH = GRID_SIZE * CELL_SIZE
 HEIGHT = GRID_SIZE * CELL_SIZE
 FPS = 30
@@ -12,6 +12,9 @@ BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
+
+BEIGE = (240,210,180)
+
 
 
 class Unit:
@@ -27,6 +30,8 @@ class Unit:
         La position y de l'unité sur la grille.
     health : int
         La santé de l'unité.
+    health_max : int                    ###################################
+        La santé maximale de l'unité 
     attack_power : int
         La puissance d'attaque de l'unité.
     team : str
@@ -64,10 +69,15 @@ class Unit:
         self.x = x
         self.y = y
         self.health = health
+        self.__health_max = health  # *H*
         self.attack_power = attack_power
         self.team = team  # 'player' ou 'enemy'
         self.is_selected = False
-
+        
+    @property
+    def health_max(self):   # *H*
+        return self.__health_max
+    
     def move(self, dx, dy):
         """Déplace l'unité de dx, dy."""
         if 0 <= self.x + dx < GRID_SIZE and 0 <= self.y + dy < GRID_SIZE:

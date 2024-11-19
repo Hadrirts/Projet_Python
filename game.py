@@ -2,7 +2,7 @@ import pygame
 import random
 
 from unit import *
-
+from cases import * # *H*
 
 class Game:
     """
@@ -34,6 +34,8 @@ class Game:
 
         self.enemy_units = [Unit(6, 6, 8, 1, 'enemy'),
                             Unit(7, 6, 8, 1, 'enemy')]
+        
+        self.cases = [Lave(2,2,self),Guerison(5,6,self)] # Cases spéciales *H*
 
     def handle_player_turn(self):
         """Tour du joueur"""
@@ -68,8 +70,20 @@ class Game:
                             dy = 1
 
                         selected_unit.move(dx, dy)
-                        self.flip_display()
-
+                        
+                        self.flip_display() # Met à jour l'écran de jeu
+                        
+                        # Effets des case *H*  -->
+                        
+                        for case in self.cases:
+                            if case.rect.collidepoint(selected_unit.x * CELL_SIZE, selected_unit.y * CELL_SIZE):  # Si l'unité est dans une case spéciale
+                                case.effect(selected_unit)   # Applique les effets de la case
+                                has_acted = case.next
+                                selected_unit.is_selected = not(case.next)
+                                break
+                                
+                        # <-- *H*
+                        
                         # Attaque (touche espace) met fin au tour
                         if event.key == pygame.K_SPACE:
                             for enemy in self.enemy_units:
@@ -97,6 +111,7 @@ class Game:
                 if target.health <= 0:
                     self.player_units.remove(target)
 
+
     def flip_display(self):
         """Affiche le jeu."""
 
@@ -104,9 +119,16 @@ class Game:
         self.screen.fill(BLACK)
         for x in range(0, WIDTH, CELL_SIZE):
             for y in range(0, HEIGHT, CELL_SIZE):
-                rect = pygame.Rect(x, y, CELL_SIZE, CELL_SIZE)
-                pygame.draw.rect(self.screen, WHITE, rect, 1)
-
+                self.rect = pygame.Rect(x, y, CELL_SIZE, CELL_SIZE)
+                pygame.draw.rect(self.screen, WHITE, self.rect, 1)
+                
+        # Affiche les cases spéciales *H* -->
+        
+        for case in self.cases :
+            case.draw(self.screen)
+            
+       # <-- *H*
+        
         # Affiche les unités
         for unit in self.player_units + self.enemy_units:
             unit.draw(self.screen)
