@@ -29,13 +29,15 @@ class Game:
             La surface de la fenêtre du jeu.
         """
         self.screen = screen
-        self.player_units = [Unit(0, 0, 10, 2, 'player'),
-                             Unit(1, 0, 10, 2, 'player')]
+        self.player_units = [Unit(0, 0, 10, 2, 1,'player'),
+                             Unit(1, 0, 10, 2, 2,'player')]
 
-        self.enemy_units = [Unit(6, 6, 8, 1, 'enemy'),
-                            Unit(7, 6, 8, 1, 'enemy')]
+        self.enemy_units = [Unit(6, 6, 8, 1, 2,'enemy'),
+                            Unit(7, 6, 8, 1, 1,'enemy')]
         
-        self.cases = [Lave(2,2,self),Guerison(5,6,self)] # Cases spéciales *H*
+        self.cases = [Lave(2,2,self),
+                      Guerison(5,6,self),
+                      Mur(3,4,self)] # Cases spéciales *H*
 
     def handle_player_turn(self):
         """Tour du joueur"""
@@ -68,17 +70,25 @@ class Game:
                             dy = -1
                         elif event.key == pygame.K_DOWN:
                             dy = 1
-
-                        selected_unit.move(dx, dy)
+                            
+                    # Gestion des déplacements 
+                        
+                        for case in self.cases:
+                            if isinstance(case,Mur):
+                                case.dx = dx
+                                case.dy = dy
+                                for _ in range(selected_unit.speed) :      # Gestion de la vitesse
+                                    if not(case.effect(selected_unit)):    # Gestion des murs
+                                        selected_unit.move(dx, dy)         
                         
                         self.flip_display() # Met à jour l'écran de jeu
                         
-                        # Effets des case *H*  -->
+                        # Effets des cases *H*  -->
                         
                         for case in self.cases:
                             if case.rect.collidepoint(selected_unit.x * CELL_SIZE, selected_unit.y * CELL_SIZE):  # Si l'unité est dans une case spéciale
                                 case.effect(selected_unit)   # Applique les effets de la case
-                                has_acted = case.next
+                                has_acted = case.next        
                                 selected_unit.is_selected = not(case.next)
                                 break
                                 
@@ -127,7 +137,7 @@ class Game:
         for case in self.cases :
             case.draw(self.screen)
             
-       # <-- *H*
+        # <-- *H*
         
         # Affiche les unités
         for unit in self.player_units + self.enemy_units:

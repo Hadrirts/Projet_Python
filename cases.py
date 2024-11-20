@@ -119,7 +119,18 @@ class Guerison(Case):
             self.Game.flip_display()
             self.next = True  # Guérison active -> passer à l'unité suivante
         
-            
-        
+
+class Mur(Case):
+    def __init__(self,x,y,Game):
+        super().__init__(x,y,Game)
+        self.color = GREY
+        self.dx = 0
+        self.dy = 0
+    
+    def effect(self,unit): # *Décrire la methode plus haut*
+        self.next = False
+        if self.rect.collidepoint((unit.x + self.dx) * CELL_SIZE, (unit.y + self.dy) * CELL_SIZE):  # Si Unit est dans un mur
+            return True
+
             
 
