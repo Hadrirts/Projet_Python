@@ -74,7 +74,7 @@ class Game:
                     # Gestion des déplacements 
                         
                         for case in self.cases:
-                            if isinstance(case,Mur):
+                            if isinstance(case,Mur):                       # Gestion des murs
                                 case.dx = dx
                                 case.dy = dy
                                 for _ in range(selected_unit.speed) :      # Gestion de la vitesse
