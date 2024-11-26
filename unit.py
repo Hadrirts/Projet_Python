@@ -50,7 +50,7 @@ class Unit:
         Dessine l'unité sur la grille.
     """
 
-    def __init__(self, x, y, health, attack_power, speed, team):
+    def __init__(self, x, y, health, attack_power, team):
         """
         Construit une unité avec une position, une santé, une puissance d'attaque et une équipe.
 
@@ -71,7 +71,6 @@ class Unit:
         self.y = y
         self.health = health
         self.__health_max = health  # *H*
-        self.__speed = speed        # *H*
         self.attack_power = attack_power
         self.team = team  # 'player' ou 'enemy'
         self.is_selected = False
@@ -80,11 +79,6 @@ class Unit:
     @property
     def health_max(self):   
         return self.__health_max
-    
-    @property
-    def speed(self):
-        return self.__speed
-    # <-- *H*
     
     def move(self, dx, dy):
         """Déplace l'unité de dx, dy."""

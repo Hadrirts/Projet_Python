@@ -29,11 +29,11 @@ class Game:
             La surface de la fenêtre du jeu.
         """
         self.screen = screen
-        self.player_units = [Unit(0, 0, 10, 2, 1,'player'),
-                             Unit(1, 0, 10, 2, 2,'player')]
+        self.player_units = [Unit(0, 0, 10, 2, 'player'),
+                             Unit(1, 0, 10, 2, 'player')]
 
-        self.enemy_units = [Unit(6, 6, 8, 1, 2,'enemy'),
-                            Unit(7, 6, 8, 1, 1,'enemy')]
+        self.enemy_units = [Unit(6, 6, 8, 1, 'enemy'),
+                            Unit(7, 6, 8, 1, 'enemy')]
         
         self.cases = [Lave(2,2,self),
                       Guerison(5,6,self),
@@ -77,9 +77,8 @@ class Game:
                             if isinstance(case,Mur):                       # Gestion des murs
                                 case.dx = dx
                                 case.dy = dy
-                                for _ in range(selected_unit.speed) :      # Gestion de la vitesse
-                                    if not(case.effect(selected_unit)):    # Gestion des murs
-                                        selected_unit.move(dx, dy)         
+                                if not(case.effect(selected_unit)):    # Gestion des murs
+                                    selected_unit.move(dx, dy)         
                         
                         self.flip_display() # Met à jour l'écran de jeu
                         
