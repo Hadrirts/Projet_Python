@@ -1,51 +1,94 @@
-class Attack:
-    def __init__(self, name, damage, range):
-        self.name = name
-        self.damage = damage
-        self.range = range
-
-    def execute(self, attacker, target):
-        if abs(attacker.x - target.x) <= self.range and abs(attacker.y - target.y) <= self.range:
-            target.health -= self.damage
-            print(f"{attacker.name} used {self.name} on {target.name} for {self.damage} damage!")
-
-class PistolAttack(Attack):
-    def __init__(self, name, damage, range):
-        super().__init__(name, damage, range)
-
-    def execute(self, attacker, target):
-        if abs(attacker.x - target.x) <= self.range and abs(attacker.y - target.y) <= self.range:
-            target.health -= self.damage
-            print(f"{attacker.name} used {self.name} on {target.name} for {self.damage} damage!")
-
-class SniperAttack(Attack):
-    def __init__(self, name, damage, range):
-        super().__init__(name, damage, range)
-
-    def get_targets_in_line(self, attacker, game):
-        """Retourne toutes les unités dans la ligne de vue"""
-        potential_targets = []
-        
-        # Vérifier les unités sur la même ligne horizontale ***a ameliorer***
-        for unit in game.enemy_units:
-            # Même ligne
-            if unit.y == attacker.y and abs(unit.x - attacker.x) <= self.range:
-                potential_targets.append(unit)
-            # Même colonne    
-            elif unit.x == attacker.x and abs(unit.y - attacker.y) <= self.range:
-                potential_targets.append(unit)
-            # Diagonales
-            elif abs(unit.x - attacker.x) == abs(unit.y - attacker.y) and abs(unit.x - attacker.x) <= self.range:
-                potential_targets.append(unit)
-                
-        return potential_targets
-
-    def execute(self, attacker, game):
-        targets = self.get_targets_in_line(attacker, game)
-        if targets:
-            # Pour l'instant on prend la première cible
-            # Plus tard on pourra ajouter une sélection par le joueur
-            target = targets[0]
-            target.health -= self.damage
-            print(f"{attacker.name} used {self.name} on {target.name} for {self.damage} damage!")
+import math
+class Competence:
+    def __init__(self, nom, degats, portee, type_competence, cout):
+        self.nom = nom
+        self.degats = degats
+        self.portee = portee
+        self.type_competence = type_competence
+        self.cout = cout
     
+    def utiliser(self, caster, target):
+        """Applique l'effet de la compétence si la cible est dans la portée."""
+        raise NotImplementedError("La méthode 'utiliser' doit être implémentée dans les sous-classes.")
+class BouleDeFeu(Competence):
+    def __init__(self):
+        super().__init__("Boule de feu", 15, 3, "magique", 3)
+        self.zone_type = "cercle"
+        self.rayon_impact = 2
+
+    def utiliser(self, caster, target, enemy_units):
+        """Utilise la boule de feu, affectant une zone circulaire autour de la cible."""
+        if abs(caster.x - target.x) <= self.portee and abs(caster.y - target.y) <= self.portee:
+            affected_units = self.get_units_in_cercle(caster, target, enemy_units)
+            for unit in affected_units:
+                unit.health -= self.degats
+            return f"{caster.name} utilise {self.nom} et touche {len(affected_units)} unités dans la zone circulaire, causant {self.degats} dégâts."
+        return f"{target.name} est hors de portée pour {self.nom}."
+
+    def get_units_in_cercle(self, caster, target, enemy_units):
+        """Retourne les unités dans une zone circulaire autour de la cible."""
+        affected_units = []
+        for unit in enemy_units:
+            distance = math.sqrt((unit.x - target.x)**2 + (unit.y - target.y)**2)
+            if distance <= self.rayon_impact:  # Vérifie si l'unité est dans la zone d'impact
+                affected_units.append(unit)
+        return affected_units
+class Tir(Competence):
+    def __init__(self):
+        super().__init__("Tir", 10, 3, "physique", 2)
+        self.zone_type = "ligne"
+        self.direction = "horizontale"
+
+    def utiliser(self, caster, target, enemy_units):
+        """Utilise le tir en ligne, affectant une ligne droite dans la direction spécifiée."""
+        if abs(caster.x - target.x) <= self.portee and abs(caster.y - target.y) <= self.portee:
+            affected_units = self.get_units_in_ligne(caster, target, enemy_units)
+            for unit in affected_units:
+                unit.health -= self.degats
+            return f"{caster.name} utilise {self.nom} et touche {len(affected_units)} unités dans la ligne, causant {self.degats} dégâts."
+        return f"{target.name} est hors de portée pour {self.nom}."
+
+    def get_units_in_ligne(self, caster, target, enemy_units):
+        """Retourne les unités dans une ligne droite horizontale autour de la cible."""
+        affected_units = []
+        if self.direction == "horizontale":
+            for unit in enemy_units:
+                if unit.y == target.y and abs(unit.x - target.x) <= self.portee:
+                    affected_units.append(unit)
+        elif self.direction == "verticale":
+            for unit in enemy_units:
+                if unit.x == target.x and abs(unit.y - target.y) <= self.portee:
+                    affected_units.append(unit)
+        return affected_units
+class Soin(Competence):
+    def __init__(self):
+        super().__init__("Soin", -10, 1, "magique", 2)
+        self.zone_type = "cible"
+    
+    def utiliser(self, caster, target, enemy_units):
+        """Utilise le soin sur une unité alliée."""
+        if abs(caster.x - target.x) <= self.portee and abs(caster.y - target.y) <= self.portee:
+            target.health += self.degats  # Le soin est un effet positif, donc on ajoute les points de vie
+            return f"{caster.name} utilise {self.nom} et soigne {target.name} de {abs(self.degats)} points de vie."
+        return f"{target.name} est hors de portée pour {self.nom}."
+class Spin(Competence):
+    def __init__(self):
+        super().__init__("Spin", 20, 1, "physique", 5)
+        self.zone_type = "cercle"
+        self.rayon_impact = 1
+
+    def utiliser(self, caster, target, enemy_units):
+        """Utilise le Spin pour infliger des dégâts dans un rayon autour du caster."""
+        affected_units = self.get_units_in_cercle(caster, target, enemy_units)
+        for unit in affected_units:
+            unit.health -= self.degats
+        return f"{caster.name} utilise {self.nom} et touche {len(affected_units)} unités dans la zone circulaire, causant {self.degats} dégâts."
+
+    def get_units_in_cercle(self, caster, target, enemy_units):
+        """Retourne les unités dans une zone circulaire autour du caster."""
+        affected_units = []
+        for unit in enemy_units:
+            distance = math.sqrt((unit.x - caster.x)**2 + (unit.y - caster.y)**2)
+            if distance <= self.rayon_impact:  # Vérifie si l'unité est dans la zone d'impact
+                affected_units.append(unit)
+        return affected_units
