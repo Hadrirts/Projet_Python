@@ -1,5 +1,6 @@
 import pygame
 import random
+import competences
 
 # Constantes
 GRID_SIZE = 8   # Nombre de cases
@@ -99,3 +100,20 @@ class Unit:
                              self.y * CELL_SIZE, CELL_SIZE, CELL_SIZE))
         pygame.draw.circle(screen, color, (self.x * CELL_SIZE + CELL_SIZE //
                            2, self.y * CELL_SIZE + CELL_SIZE // 2), CELL_SIZE // 3)
+
+class guerrier(Unit):
+    def __init__(self, x, y, health, attack_power, team):
+        super().__init__(x, y, health, attack_power, team)
+        self.competences = competences.Spin()
+class archer(Unit):
+    def __init__(self, x, y, health, attack_power, team):
+        super().__init__(x, y, health, attack_power, team)
+        self.competences = competences.Tir()
+class mage(Unit):
+    def __init__(self, x, y, health, attack_power, team):
+        super().__init__(x, y, health, attack_power, team)#x,y,60,20,team
+        self.competences = competences.Soin()
+class paladin(Unit):
+    def __init__(self, x, y, health, attack_power, team):
+        super().__init__(x, y, health, attack_power, team)
+        self.competences = competences.Soin()
