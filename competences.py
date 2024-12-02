@@ -25,7 +25,8 @@ class BouleDeFeu(Competence):
                 if unit.health <= 0:
                     enemy_units.remove(unit)
             return f"utilise {self.nom} et touche {len(affected_units)} unités dans la zone circulaire, causant {self.degats} dégâts."
-        return f"La cible est hors de portée pour {self.nom}."
+        else:
+            return f"La cible est hors de portée pour {self.nom}."
 
     def get_units_in_cercle(self, x, y, enemy_units):
         """Retourne les unités dans une zone circulaire autour de la cible."""

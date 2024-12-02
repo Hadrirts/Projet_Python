@@ -174,8 +174,7 @@ class Game:
         """Affiche le jeu."""
 
         # Affiche la grille
-        if not viser:
-            self.screen.fill(BLACK)  # Nettoie l'écran uniquement en mode normal.
+        self.screen.fill(BLACK)  
         for x in range(0, WIDTH, CELL_SIZE):
             for y in range(0, HEIGHT, CELL_SIZE):
                 self.rect = pygame.Rect(x, y, CELL_SIZE, CELL_SIZE)
