@@ -125,7 +125,7 @@ class Game:
         """Affiche le jeu."""
 
         # Affiche la grille
-        background = pygame.image.load("Bare Bears Wallpaper.jpg")
+        background = pygame.image.load("background_test.webp")
         background = pygame.transform.scale(background, (WIDTH, HEIGHT))
         #self.screen.fill(BLACK)
         self.screen.blit(background,(0,0))

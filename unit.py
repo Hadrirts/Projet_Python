@@ -3,8 +3,8 @@ import random
 import competences
 
 # Constantes
-GRID_SIZE = 16   # Nombre de cases
-CELL_SIZE = 30   # Taille d'une case
+GRID_SIZE = 10   # Nombre de cases
+CELL_SIZE = 60   # Taille d'une case
 WIDTH = GRID_SIZE * CELL_SIZE
 HEIGHT = GRID_SIZE * CELL_SIZE
 FPS = 30
