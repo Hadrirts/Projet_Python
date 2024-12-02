@@ -112,7 +112,7 @@ class archer(Unit):
 class mage(Unit):
     def __init__(self, x, y, health, attack_power, team):
         super().__init__(x, y, health, attack_power, team)#x,y,60,20,team
-        self.competences = competences.Soin()
+        self.competences = competences.BouleDeFeu()
 class paladin(Unit):
     def __init__(self, x, y, health, attack_power, team):
         super().__init__(x, y, health, attack_power, team)

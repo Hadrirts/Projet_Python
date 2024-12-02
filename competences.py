@@ -12,30 +12,32 @@ class Competence:
         raise NotImplementedError("La méthode 'utiliser' doit être implémentée dans les sous-classes.")
 class BouleDeFeu(Competence):
     def __init__(self):
-        super().__init__("Boule de feu", 15, 3, "magique", 3)
+        super().__init__("Boule de feu", 10, 3, "skillshot", 3)
         self.zone_type = "cercle"
-        self.rayon_impact = 2
+        self.rayon = 2
 
-    def utiliser(self, caster, target, enemy_units):
+    def utiliser(self, caster, x, y, enemy_units):
         """Utilise la boule de feu, affectant une zone circulaire autour de la cible."""
-        if abs(caster.x - target.x) <= self.portee and abs(caster.y - target.y) <= self.portee:
-            affected_units = self.get_units_in_cercle(caster, target, enemy_units)
+        if abs(caster.x - x) <= self.portee and abs(caster.y - y) <= self.portee:
+            affected_units = self.get_units_in_cercle(x, y, enemy_units)
             for unit in affected_units:
                 unit.health -= self.degats
-            return f"{caster.name} utilise {self.nom} et touche {len(affected_units)} unités dans la zone circulaire, causant {self.degats} dégâts."
-        return f"{target.name} est hors de portée pour {self.nom}."
+                if unit.health <= 0:
+                    enemy_units.remove(unit)
+            return f"utilise {self.nom} et touche {len(affected_units)} unités dans la zone circulaire, causant {self.degats} dégâts."
+        return f"La cible est hors de portée pour {self.nom}."
 
-    def get_units_in_cercle(self, caster, target, enemy_units):
+    def get_units_in_cercle(self, x, y, enemy_units):
         """Retourne les unités dans une zone circulaire autour de la cible."""
         affected_units = []
         for unit in enemy_units:
-            distance = math.sqrt((unit.x - target.x)**2 + (unit.y - target.y)**2)
-            if distance <= self.rayon_impact:  # Vérifie si l'unité est dans la zone d'impact
+            distance = math.sqrt((unit.x - x)**2 + (unit.y - y)**2)
+            if distance <= self.rayon:  # Vérifie si l'unité est dans la zone d'impact
                 affected_units.append(unit)
         return affected_units
 class Tir(Competence):
     def __init__(self):
-        super().__init__("Tir", 10, 3, "physique", 2)
+        super().__init__("Tir", 10, 3, "skillshot", 2)
         self.zone_type = "ligne"
         self.direction = "horizontale"
 
@@ -45,7 +47,7 @@ class Tir(Competence):
             affected_units = self.get_units_in_ligne(caster, target, enemy_units)
             for unit in affected_units:
                 unit.health -= self.degats
-            return f"{caster.name} utilise {self.nom} et touche {len(affected_units)} unités dans la ligne, causant {self.degats} dégâts."
+            return f"utilise {self.nom} et touche {len(affected_units)} unités dans la ligne, causant {self.degats} dégâts."
         return f"{target.name} est hors de portée pour {self.nom}."
 
     def get_units_in_ligne(self, caster, target, enemy_units):
@@ -62,8 +64,7 @@ class Tir(Competence):
         return affected_units
 class Soin(Competence):
     def __init__(self):
-        super().__init__("Soin", -10, 1, "magique", 2)
-        self.zone_type = "cible"
+        super().__init__("Soin", -10, 1, "Cible", 2)
     
     def utiliser(self, caster, target, enemy_units):
         """Utilise le soin sur une unité alliée."""
@@ -73,9 +74,9 @@ class Soin(Competence):
         return f"{target.name} est hors de portée pour {self.nom}."
 class Spin(Competence):
     def __init__(self):
-        super().__init__("Spin", 20, 1, "physique", 5)
+        super().__init__("Spin", 20, 1, "skillshot", 5)
         self.zone_type = "cercle"
-        self.rayon_impact = 1
+        self.rayon = 1
 
     def utiliser(self, caster, target, enemy_units):
         """Utilise le Spin pour infliger des dégâts dans un rayon autour du caster."""
@@ -89,6 +90,6 @@ class Spin(Competence):
         affected_units = []
         for unit in enemy_units:
             distance = math.sqrt((unit.x - caster.x)**2 + (unit.y - caster.y)**2)
-            if distance <= self.rayon_impact:  # Vérifie si l'unité est dans la zone d'impact
+            if distance <= self.rayon:  # Vérifie si l'unité est dans la zone d'impact
                 affected_units.append(unit)
         return affected_units
