@@ -2,7 +2,7 @@ import pygame
 import random
 
 from unit import *
-from cases import * # *H*
+from cases import *
 
 class Game:
     """
@@ -29,7 +29,7 @@ class Game:
             La surface de la fenêtre du jeu.
         """
         self.screen = screen
-        self.player_units = [Unit(0, 0, 10, 2, 'player'),
+        self.player_units = [Canard(0, 0, 10, 2, 'player'),
                              Unit(1, 0, 10, 2, 'player')]
 
         self.enemy_units = [Unit(6, 6, 8, 1, 'enemy'),
@@ -125,7 +125,10 @@ class Game:
         """Affiche le jeu."""
 
         # Affiche la grille
-        self.screen.fill(BLACK)
+        background = pygame.image.load("Bare Bears Wallpaper.jpg")
+        background = pygame.transform.scale(background, (WIDTH, HEIGHT))
+        #self.screen.fill(BLACK)
+        self.screen.blit(background,(0,0))
         for x in range(0, WIDTH, CELL_SIZE):
             for y in range(0, HEIGHT, CELL_SIZE):
                 self.rect = pygame.Rect(x, y, CELL_SIZE, CELL_SIZE)
