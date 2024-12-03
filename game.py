@@ -3,6 +3,7 @@ import random
 
 from unit import *
 from cases import *
+from interface import *
 
 class Game:
     """
@@ -150,6 +151,12 @@ class Game:
 
 
 def main():
+
+    # Créer une instance de l'interface
+    interface = Interface()
+
+    # Lancer le menu principal
+    interface.display_menu()
 
     # Initialisation de Pygame
     pygame.init()
