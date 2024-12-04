@@ -1,13 +1,7 @@
 import pygame
 import sys
-from unit import guerrier, archer, mage, paladin  # Importer les classes d'unités
+from unit import *  # Importer les classes d'unités
 
-# Constantes
-WIDTH, HEIGHT = 800, 600
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-GREY = (150, 150, 150)
-FPS = 60
 
 class Interface:
     def __init__(self):

@@ -105,10 +105,8 @@ class Unit:
 class Canard(Unit):
     def draw(self,screen):
         canard = pygame.image.load("canard.png")
-        if self.is_selected:
-            canard = pygame.image.load("canard.png")
-            canard = pygame.transform.scale(canard, (CELL_SIZE, CELL_SIZE)) # redimensionner l'image
-            screen.blit(canard,(self.x * CELL_SIZE,self.y * CELL_SIZE)) # afficher l'image
+        canard = pygame.transform.scale(canard, (CELL_SIZE, CELL_SIZE)) # redimensionner l'image
+        screen.blit(canard,(self.x * CELL_SIZE,self.y * CELL_SIZE)) # afficher l'image
 
 class guerrier(Unit):
     def __init__(self, x, y, health, attack_power, team):

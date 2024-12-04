@@ -49,7 +49,8 @@ class Case(ABC):
         self.__Game = Game
            
     def draw(self, screen):
-        pygame.draw.rect(screen, self.color, self.rect)    
+        #pygame.draw.rect(screen, self.color, self.rect)     # Case couleur unie
+        screen.blit(self.image,(CELL_SIZE*self.x,CELL_SIZE*self.y))            # Case Image
     
     @abstractmethod
     def effect(self,unit):
@@ -63,7 +64,9 @@ class Lave(Case):
     
     def __init__(self,x,y,Game):
         super().__init__(x,y,Game)
-        self.color = RED
+        #self.color = RED
+        self.image = pygame.image.load("lave.jpg")
+        self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE)) # redimensionner l'image
         self.__degats = 5
         
     @property
@@ -97,7 +100,9 @@ class Lave(Case):
 class Guerison(Case):
     def __init__(self,x,y,Game):
         super().__init__(x,y,Game)
-        self.color = BEIGE
+        #self.color = BEIGE
+        self.image = pygame.image.load("healing.png")
+        self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE)) # redimensionner l'image
         self.__healing = 5
         
     @property
@@ -123,13 +128,13 @@ class Guerison(Case):
 class Mur(Case):
     def __init__(self,x,y,Game):
         super().__init__(x,y,Game)
-        self.color = GREY
-        self.dx = 0
-        self.dy = 0
+       # self.color = GREY
+        self.image = pygame.image.load("mur.png")
+        self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE)) # redimensionner l'image
     
-    def effect(self,unit): # *Décrire la methode plus haut*
+    def effect(self,unit,dx=0,dy=0): # *Décrire la methode plus haut*
         self.next = False
-        if self.rect.collidepoint((unit.x + self.dx) * CELL_SIZE, (unit.y + self.dy) * CELL_SIZE):  # Si Unit est dans un mur
+        if self.rect.collidepoint((unit.x + dx) * CELL_SIZE, (unit.y + dy) * CELL_SIZE):  # Si Unit est dans un mur
             return True
 
             

@@ -35,10 +35,18 @@ class Game:
 
         self.enemy_units = [Unit(6, 6, 8, 1, 'enemy'),
                             Unit(7, 6, 8, 1, 'enemy')]
+        # Coordonnées des cases spéciales
+        lave_coord = [[2,2],[3,2],[2,1]]
+        guerison_coord = [[5,6],[3,4]]
+        mur_coord = [[2,4],[3,5],[4,4],[5,4],[6,3],[6,6]]
+        # On définit les cases
+        lave = [Lave(i,j,self) for i,j, in lave_coord]
+        guerison = [Guerison(i,j,self) for i,j in guerison_coord]
+        mur = [Mur(i,j,self) for i,j in mur_coord]
         
-        self.cases = [Lave(2,2,self),
-                      Guerison(5,6,self),
-                      Mur(3,4,self)] # Cases spéciales *H*
+        self.cases = lave+guerison+mur   # Cases spéciales *H*
+       
+        
 
     def handle_player_turn(self):
         """Tour du joueur"""
@@ -73,13 +81,14 @@ class Game:
                             dy = 1
                             
                     # Gestion des déplacements 
-                        
+                        mur = False
                         for case in self.cases:
                             if isinstance(case,Mur):                       # Gestion des murs
-                                case.dx = dx
-                                case.dy = dy
-                                if not(case.effect(selected_unit)):    # Gestion des murs
-                                    selected_unit.move(dx, dy)         
+                                if case.effect(selected_unit,dx,dy):   # Si l'unité rencontre un mur
+                                    mur = True
+                                    break
+                        if mur == False:
+                            selected_unit.move(dx, dy)         
                         
                         self.flip_display() # Met à jour l'écran de jeu
                         
@@ -125,11 +134,12 @@ class Game:
     def flip_display(self):
         """Affiche le jeu."""
 
-        # Affiche la grille
-        background = pygame.image.load("background_test.webp")
+        # Affiche le background
+        background = pygame.image.load("background.png")
         background = pygame.transform.scale(background, (WIDTH, HEIGHT))
         #self.screen.fill(BLACK)
         self.screen.blit(background,(0,0))
+        # Affiche la grille
         for x in range(0, WIDTH, CELL_SIZE):
             for y in range(0, HEIGHT, CELL_SIZE):
                 self.rect = pygame.Rect(x, y, CELL_SIZE, CELL_SIZE)
