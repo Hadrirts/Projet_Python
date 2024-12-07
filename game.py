@@ -31,14 +31,14 @@ class Game:
         """
         self.screen = screen
         self.player_units = [Canard(0, 0, 10, 2, 'player'),
-                             Unit(1, 0, 10, 2, 'player')]
+                             Canard(1, 0, 10, 2, 'player')]
 
-        self.enemy_units = [Unit(6, 6, 8, 1, 'enemy'),
-                            Unit(7, 6, 8, 1, 'enemy')]
+        self.enemy_units = [Canard(6, 6, 8, 1, 'enemy'),
+                            Canard(7, 6, 8, 1, 'enemy')]
         # Coordonnées des cases spéciales
         lave_coord = [[2,2],[3,2],[2,1]]
         guerison_coord = [[5,6],[3,4]]
-        mur_coord = [[2,4],[3,5],[4,4],[5,4],[6,3],[6,6]]
+        mur_coord = [[2,4],[3,5],[4,4],[5,4],[6,3]]
         # On définit les cases
         lave = [Lave(i,j,self) for i,j, in lave_coord]
         guerison = [Guerison(i,j,self) for i,j in guerison_coord]

@@ -75,6 +75,7 @@ class Unit:
         self.attack_power = attack_power
         self.team = team  # 'player' ou 'enemy'
         self.is_selected = False
+        self.image = 0
         
     # *H* -->
     @property
@@ -94,19 +95,22 @@ class Unit:
 
     def draw(self, screen):
         """Affiche l'unité sur l'écran."""
-        color = BLUE if self.team == 'player' else RED
+        #color = BLUE if self.team == 'player' else RED
         if self.is_selected:
             pygame.draw.rect(screen, GREEN, (self.x * CELL_SIZE,
                              self.y * CELL_SIZE, CELL_SIZE, CELL_SIZE))
-        pygame.draw.circle(screen, color, (self.x * CELL_SIZE + CELL_SIZE //
-                           2, self.y * CELL_SIZE + CELL_SIZE // 2), CELL_SIZE // 3)
+        # pygame.draw.circle(screen, color, (self.x * CELL_SIZE + CELL_SIZE //
+        #                    2, self.y * CELL_SIZE + CELL_SIZE // 2), CELL_SIZE // 3)
+        self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE)) # redimensionner l'image
+        screen.blit(self.image,(self.x * CELL_SIZE,self.y * CELL_SIZE)) # afficher l'image
+        pygame.draw.rect(screen, RED, (self.x * CELL_SIZE,self.y * CELL_SIZE, round(CELL_SIZE * self.health/self.health_max), 3 )) # Barre de santé
+        
         
 # Test Hadriel:
 class Canard(Unit):
-    def draw(self,screen):
-        canard = pygame.image.load("canard.png")
-        canard = pygame.transform.scale(canard, (CELL_SIZE, CELL_SIZE)) # redimensionner l'image
-        screen.blit(canard,(self.x * CELL_SIZE,self.y * CELL_SIZE)) # afficher l'image
+    def __init__(self, x, y, health, attack_power, team):
+        super().__init__(x, y, health, attack_power, team)
+        self.image = pygame.image.load("canard.png") if self.team == 'player' else pygame.image.load("evil_canard.png")
 
 class guerrier(Unit):
     def __init__(self, x, y, health, attack_power, team):
