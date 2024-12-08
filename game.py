@@ -33,18 +33,25 @@ class Game:
         self.player_units = [Canard(0, 0, 10, 2, 'player'),
                              Canard(1, 0, 10, 2, 'player')]
 
-        self.enemy_units = [Canard(6, 6, 8, 1, 'enemy'),
-                            Canard(7, 6, 8, 1, 'enemy')]
+        self.enemy_units = [Canard(GRID_SIZE-1, GRID_SIZE-1, 8, 1, 'enemy'),
+                            Canard(GRID_SIZE-2, GRID_SIZE-1, 8, 1, 'enemy')]
+        
         # Coordonnées des cases spéciales
-        lave_coord = [[2,2],[3,2],[2,1]]
-        guerison_coord = [[5,6],[3,4]]
-        mur_coord = [[2,4],[3,5],[4,4],[5,4],[6,3]]
+        lave_coord = []
+        guerison_coord = [[6,6],[3,3],[9,3],[3,9],[9,9]]
+        mur_coord = [[2,2],[2,3],[3,2],[9,2],[10,2],[10,3],[2,9],[2,10],[3,10],[10,9],[10,10],[9,10],
+                     [5,4],[6,4],[7,4],[5,8],[6,8],[7,8],
+                     [0,6],[12,6],[6,1],[6,11]]   
+        # Générer des cases de lave aléatoirement
+        list_coord = mur_coord+guerison_coord+[[i.x,i.y] for i in self.player_units+self.enemy_units] # Liste des cases déjà prises
+        lave_coord = rand_coord(GRID_SIZE,10,list_coord)
+        
         # On définit les cases
         lave = [Lave(i,j,self) for i,j, in lave_coord]
         guerison = [Guerison(i,j,self) for i,j in guerison_coord]
-        mur = [Mur(i,j,self) for i,j in mur_coord]
+        self.mur = [Mur(i,j,self) for i,j in mur_coord]
         
-        self.cases = lave+guerison+mur   # Cases spéciales *H*
+        self.cases = lave+self.mur+guerison
        
         
 
@@ -81,14 +88,15 @@ class Game:
                             dy = 1
                             
                     # Gestion des déplacements 
-                        mur = False
-                        for case in self.cases:
-                            if isinstance(case,Mur):                       # Gestion des murs
-                                if case.effect(selected_unit,dx,dy):   # Si l'unité rencontre un mur
-                                    mur = True
-                                    break
-                        if mur == False:
-                            selected_unit.move(dx, dy)         
+                        # mur = False
+                        # for case in self.cases:
+                        #     if isinstance(case,Mur):                       # Gestion des murs
+                        #         if case.effect(selected_unit,dx,dy):   # Si l'unité rencontre un mur
+                        #             mur = True
+                        #             break
+                        # if mur == False:
+                        #     selected_unit.move(dx, dy) 
+                        selected_unit.move(dx, dy,self.mur) 
                         
                         self.flip_display() # Met à jour l'écran de jeu
                         
@@ -96,9 +104,12 @@ class Game:
                         
                         for case in self.cases:
                             if case.rect.collidepoint(selected_unit.x * CELL_SIZE, selected_unit.y * CELL_SIZE):  # Si l'unité est dans une case spéciale
-                                case.effect(selected_unit)   # Applique les effets de la case
-                                has_acted = case.next        
-                                selected_unit.is_selected = not(case.next)
+                                if isinstance(case,Lave):
+                                    case.effect(selected_unit,self.mur) # Applique les effets de la case
+                                else:
+                                    case.effect(selected_unit)   # Applique les effets de la case
+                                    has_acted = case.next        
+                                    selected_unit.is_selected = not(case.next)
                                 break
                                 
                         # <-- *H*
@@ -122,7 +133,7 @@ class Game:
             target = random.choice(self.player_units)
             dx = 1 if enemy.x < target.x else -1 if enemy.x > target.x else 0
             dy = 1 if enemy.y < target.y else -1 if enemy.y > target.y else 0
-            enemy.move(dx, dy)
+            enemy.move(dx, dy,self.mur)
 
             # Attaque si possible
             if abs(enemy.x - target.x) <= 1 and abs(enemy.y - target.y) <= 1:
@@ -135,22 +146,29 @@ class Game:
         """Affiche le jeu."""
 
         # Affiche le background
-        background = pygame.image.load("background.png")
-        background = pygame.transform.scale(background, (WIDTH, HEIGHT))
-        #self.screen.fill(BLACK)
-        self.screen.blit(background,(0,0))
-        # Affiche la grille
-        for x in range(0, WIDTH, CELL_SIZE):
-            for y in range(0, HEIGHT, CELL_SIZE):
-                self.rect = pygame.Rect(x, y, CELL_SIZE, CELL_SIZE)
-                pygame.draw.rect(self.screen, WHITE, self.rect, 1)
+        
+        background = pygame.image.load("sol.png") 
+        background = pygame.transform.scale(background, (WIDTH, HEIGHT)) 
+        self.screen.blit(background,(0,0)) 
+        
+        # sol = pygame.image.load("sol.png")
+        # sol = pygame.transform.scale(sol, (CELL_SIZE*2, CELL_SIZE*2))
+        # for x in range(0, WIDTH, CELL_SIZE):
+        #     for y in range(0, HEIGHT, CELL_SIZE):
+        #         self.screen.blit(sol,(x,y))
                 
-        # Affiche les cases spéciales *H* -->
+        
+
+        # # Affiche la grille
+        # for x in range(0, WIDTH, CELL_SIZE):
+        #     for y in range(0, HEIGHT, CELL_SIZE):
+        #         self.rect = pygame.Rect(x, y, CELL_SIZE, CELL_SIZE)
+        #         pygame.draw.rect(self.screen, WHITE, self.rect, 1)
+                
+        # Affiche les cases spéciales
         
         for case in self.cases :
-            case.draw(self.screen)
-            
-        # <-- *H*
+            case.draw(self.screen)       
         
         # Affiche les unités
         for unit in self.player_units + self.enemy_units:

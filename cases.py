@@ -6,6 +6,26 @@ from unit import *
 @author: Hadriel
 """
 
+# Générer des cases aléatoirement
+def rand_coord(grid_size,nb_cases,coord_list):
+    
+    coord = []
+    
+    min_val = 0
+    max_val = grid_size-1
+    for i in range(nb_cases):
+        while True:
+            a = random.randint(min_val, max_val)
+            b = random.randint(min_val, max_val)
+            couple = [a,b]
+            
+            if couple not in coord_list:
+                coord.append(couple)
+                coord_list.append(couple)
+                break
+
+    return coord
+    
 class Case(ABC):
     """
     x,y : coordonées du coin supérieur gauche de la case, int ou liste
@@ -65,7 +85,7 @@ class Lave(Case):
     def __init__(self,x,y,Game):
         super().__init__(x,y,Game)
         #self.color = RED
-        self.image = pygame.image.load("lave.jpg")
+        self.image = pygame.image.load("lave.png")
         self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE)) # redimensionner l'image
         self.__degats = 5
         
@@ -73,7 +93,7 @@ class Lave(Case):
     def degats(self):
         return self.__degats
     
-    def effect(self,unit):
+    def effect(self,unit,murs):
         self.next = False # Rester sur l'unité
         if self.rect.collidepoint(unit.x * CELL_SIZE, unit.y * CELL_SIZE): # Si l'Unit est dans une zone de lave
 
@@ -84,7 +104,7 @@ class Lave(Case):
                dy = random.choice([-1,0,1])
                 
             pygame.time.delay(100)
-            unit.move(dx, dy)   # Déplacement
+            unit.move(dx, dy, murs)   # Déplacement
             self.Game.flip_display()
             unit.health -= self.__degats # Se brûle -> Perd 5 PV
             print(f"PV : {unit.health} (-{self.__degats})")

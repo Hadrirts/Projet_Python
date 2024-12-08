@@ -3,8 +3,8 @@ import random
 import competences
 
 # Constantes
-GRID_SIZE = 10   # Nombre de cases
-CELL_SIZE = 60   # Taille d'une case
+GRID_SIZE = 13   # Nombre de cases
+CELL_SIZE = 55   # Taille d'une case
 WIDTH = GRID_SIZE * CELL_SIZE
 HEIGHT = GRID_SIZE * CELL_SIZE
 FPS = 30
@@ -71,22 +71,29 @@ class Unit:
         self.x = x
         self.y = y
         self.health = health
-        self.__health_max = health  # *H*
+        self.__health_max = health 
         self.attack_power = attack_power
         self.team = team  # 'player' ou 'enemy'
         self.is_selected = False
-        self.image = 0
         
-    # *H* -->
+
     @property
     def health_max(self):   
         return self.__health_max
     
-    def move(self, dx, dy):
+    def move(self, dx, dy,murs):
         """Déplace l'unité de dx, dy."""
         if 0 <= self.x + dx < GRID_SIZE and 0 <= self.y + dy < GRID_SIZE:
-            self.x += dx
-            self.y += dy
+            
+        # Gestion des murs
+            mur_ok = False
+            for mur in murs:                     
+                if mur.effect(self,dx,dy):   # Si l'unité rencontre un mur
+                    mur_ok = True
+                    break
+            if mur_ok == False:   # Si il n'y a pas de mur
+                self.x += dx
+                self.y += dy
 
     def attack(self, target):
         """Attaque une unité cible."""
