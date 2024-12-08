@@ -1,8 +1,9 @@
 import pygame
 import random
+import numpy as np
 
 from unit import *
-from cases import * # *H*
+from cases import *
 
 class Game:
     """
@@ -38,25 +39,18 @@ class Game:
         self.cases = [Lave(2,2,self),
                       Guerison(5,6,self),
                       Mur(3,4,self)] # Cases spéciales *H*
+        self.aim_surface = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
 
     def viser_et_utiliser_competence(self, unit, competence):
-        """Permet de viser une zone et d'utiliser une compétence."""
-        x, y = unit.x, unit.y  # Point de départ (position de l'unité)
-        rayon = competence.rayon  # Rayon d'effet de la compétence
+        x, y = unit.x, unit.y
         viser = True
 
         while viser:
-            self.flip_display()
-            self.afficher_zone_visee(self.screen, x, y, rayon)
-            pygame.display.flip()
+            self.afficher_zone_visee(x, y, competence.rayon)
+            self.flip_display(viser_mode=True)
 
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    exit()
-
                 if event.type == pygame.KEYDOWN:
-                    # Déplacement du curseur de visée
                     if event.key == pygame.K_LEFT:
                         x = max(0, x - 1)
                     elif event.key == pygame.K_RIGHT:
@@ -65,26 +59,34 @@ class Game:
                         y = max(0, y - 1)
                     elif event.key == pygame.K_DOWN:
                         y = min(HEIGHT // CELL_SIZE - 1, y + 1)
-
-                    # Validation de la visée
-                    elif event.key == pygame.K_RETURN:
-                        competence.utiliser(unit, x, y, self.enemy_units)
+                    elif event.key == pygame.K_RETURN:  # Confirmer la visée
+                        competence.utiliser(unit,x,y, self.enemy_units)
                         viser = False
-
-                    # Annuler la visée
-                    elif event.key == pygame.K_ESCAPE:
+                    elif event.key == pygame.K_ESCAPE:  # Annuler
                         viser = False
 
 
-    def afficher_zone_visee(self, screen, x, y, rayon, couleur=(255, 0, 0, 128)):
-        """Affiche la zone de visée pour un skillshot."""
-        for dx in range(-rayon, rayon + 1):
-            for dy in range(-rayon, rayon + 1):
-                if abs(dx) + abs(dy) <= rayon:  # Limite la portée à un rayon Manhattan
-                    rect = pygame.Rect(
-                        (x + dx) * CELL_SIZE, (y + dy) * CELL_SIZE, CELL_SIZE, CELL_SIZE
-                    )
-                    pygame.draw.rect(screen, couleur, rect, 0)
+
+    def afficher_zone_visee(self, target_x, target_y, rayon):
+        """Dessine une zone circulaire autour de (x, y) sur la surface temporaire."""        
+        for x in range(-rayon, rayon + 1):
+            for y in range(-rayon, rayon + 1):
+                distance = np.sqrt(x**2 + y**2)
+                if distance <= rayon:  # Si la case est dans le cercle
+                    case_x = target_x + x
+                    case_y = target_y + y
+
+                    # Vérifie que les cases restent dans les limites du plateau
+                    if 0 <= case_x < WIDTH // CELL_SIZE and 0 <= case_y < HEIGHT // CELL_SIZE:
+                        rect = pygame.Rect(case_x * CELL_SIZE, case_y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+
+                        # Dessine la case visée avec une couleur transparente
+                        pygame.draw.rect(self.aim_surface, (255, 0, 0, 100), rect)
+
+        # Affiche la surface de visée sur l'écran
+        self.screen.blit(self.aim_surface, (0, 0))
+        pygame.display.flip()
+
 
     def handle_player_turn(self):
         """Tour du joueur"""
@@ -128,17 +130,13 @@ class Game:
                                     selected_unit.move(dx, dy)         
                         
                         self.flip_display() # Met à jour l'écran de jeu
-                        
-                        # Effets des cases *H*  -->
-                        
+                                                
                         for case in self.cases:
                             if case.rect.collidepoint(selected_unit.x * CELL_SIZE, selected_unit.y * CELL_SIZE):  # Si l'unité est dans une case spéciale
                                 case.effect(selected_unit)   # Applique les effets de la case
                                 has_acted = case.next        
                                 selected_unit.is_selected = not(case.next)
                                 break
-                                
-                        # <-- *H*
                         
                         # Attaque (touche espace) met fin au tour
                         if event.key == pygame.K_SPACE:
@@ -169,30 +167,34 @@ class Game:
                 if target.health <= 0:
                     self.player_units.remove(target)
 
-
-    def flip_display(self, viser=False):
-        """Affiche le jeu."""
+    def flip_display(self, viser_mode=False):
+        """Affiche le jeu avec ou sans mode visée."""
+        self.screen.fill(BLACK)
 
         # Affiche la grille
-        self.screen.fill(BLACK)  
         for x in range(0, WIDTH, CELL_SIZE):
             for y in range(0, HEIGHT, CELL_SIZE):
-                self.rect = pygame.Rect(x, y, CELL_SIZE, CELL_SIZE)
-                pygame.draw.rect(self.screen, WHITE, self.rect, 1)
-                
-        # Affiche les cases spéciales *H* -->
-        
-        for case in self.cases :
+                rect = pygame.Rect(x, y, CELL_SIZE, CELL_SIZE)
+                pygame.draw.rect(self.screen, WHITE, rect, 1)
+
+        # Affiche les cases spéciales
+        for case in self.cases:
             case.draw(self.screen)
-            
-        # <-- *H*
-        
+
         # Affiche les unités
         for unit in self.player_units + self.enemy_units:
             unit.draw(self.screen)
 
+        # Ajoute la surface de visée si en mode visée
+        #if viser_mode:
+            
+            #self.screen.blit(self.aim_surface, (0, 0))
+            
+
         # Rafraîchit l'écran
         pygame.display.flip()
+
+      
 
 
 def main():
