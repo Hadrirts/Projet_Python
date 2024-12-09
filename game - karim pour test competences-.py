@@ -5,6 +5,8 @@ import numpy as np
 from unit import *
 from cases import *
 
+# test for git
+
 class Game:
     """
     Classe pour représenter le jeu.
