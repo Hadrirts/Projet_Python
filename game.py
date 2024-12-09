@@ -31,9 +31,9 @@ class Game:
         """
         self.screen = screen
         self.player_units = [Canard(0, 0, 10, 2, 'player'),
-                             Canard(1, 0, 10, 2, 'player')]
+                             Fée(1, 0, 10, 2, 'player')]
 
-        self.enemy_units = [Canard(GRID_SIZE-1, GRID_SIZE-1, 8, 1, 'enemy'),
+        self.enemy_units = [Fée(GRID_SIZE-1, GRID_SIZE-1, 8, 1, 'enemy'),
                             Canard(GRID_SIZE-2, GRID_SIZE-1, 8, 1, 'enemy')]
         
         # Coordonnées des cases spéciales
@@ -104,12 +104,12 @@ class Game:
                         
                         for case in self.cases:
                             if case.rect.collidepoint(selected_unit.x * CELL_SIZE, selected_unit.y * CELL_SIZE):  # Si l'unité est dans une case spéciale
-                                if isinstance(case,Lave):
-                                    case.effect(selected_unit,self.mur) # Applique les effets de la case
+                                if isinstance(case,Lave):  # Si l'
+                                    case.effect(selected_unit,self.cases) # Applique les effets de la case
                                 else:
                                     case.effect(selected_unit)   # Applique les effets de la case
-                                    has_acted = case.next        
-                                    selected_unit.is_selected = not(case.next)
+                                has_acted = case.next        
+                                selected_unit.is_selected = not(case.next)
                                 break
                                 
                         # <-- *H*
@@ -134,6 +134,15 @@ class Game:
             dx = 1 if enemy.x < target.x else -1 if enemy.x > target.x else 0
             dy = 1 if enemy.y < target.y else -1 if enemy.y > target.y else 0
             enemy.move(dx, dy,self.mur)
+            
+            # Effets des cases
+            for case in self.cases:
+                if case.rect.collidepoint(enemy.x * CELL_SIZE, enemy.y * CELL_SIZE):  # Si l'unité est dans une case spéciale
+                    if isinstance(case,Lave):
+                        case.effect(enemy,self.mur) # Applique les effets de la case
+                    else:
+                        case.effect(enemy)   # Applique les effets de la case
+                    break
 
             # Attaque si possible
             if abs(enemy.x - target.x) <= 1 and abs(enemy.y - target.y) <= 1:
@@ -150,14 +159,6 @@ class Game:
         background = pygame.image.load("sol.png") 
         background = pygame.transform.scale(background, (WIDTH, HEIGHT)) 
         self.screen.blit(background,(0,0)) 
-        
-        # sol = pygame.image.load("sol.png")
-        # sol = pygame.transform.scale(sol, (CELL_SIZE*2, CELL_SIZE*2))
-        # for x in range(0, WIDTH, CELL_SIZE):
-        #     for y in range(0, HEIGHT, CELL_SIZE):
-        #         self.screen.blit(sol,(x,y))
-                
-        
 
         # # Affiche la grille
         # for x in range(0, WIDTH, CELL_SIZE):

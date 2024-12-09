@@ -93,17 +93,30 @@ class Lave(Case):
     def degats(self):
         return self.__degats
     
-    def effect(self,unit,murs):
+    def effect(self,unit,cases):
         self.next = False # Rester sur l'unité
         if self.rect.collidepoint(unit.x * CELL_SIZE, unit.y * CELL_SIZE): # Si l'Unit est dans une zone de lave
-
-            dx = random.choice([-1,0,1])   # Se déplace aléatoirement pour éviter la lave
-            if dx == 0 :                      # Unit ne reste pas sur la case
-               dy = random.choice([-1,1])
-            else :
-               dy = random.choice([-1,0,1])
+            while True :
+                dx = random.choice([-1,0,1])   # Se déplace aléatoirement pour éviter la lave
+                if dx == 0 :                      # Unit ne reste pas sur la case
+                   dy = random.choice([-1,1])
+                else :
+                   dy = random.choice([-1,0,1])
+                safe = True
+                for case in cases:
+                    if case.rect.collidepoint((unit.x+dx) * CELL_SIZE, (unit.y+dy) * CELL_SIZE): # Eviter que l'unit aterrisse dans une autre case spéciale
+                        safe = False
+                        break  # Sortir de la boucle for 
+                    
+                if safe == True: # Si la case est libre
+                    break  # Sortir de la boucle while
                 
+            
             pygame.time.delay(100)
+            murs = []
+            for case in cases :
+                if isinstance(case,Mur):
+                    murs.append(case)
             unit.move(dx, dy, murs)   # Déplacement
             self.Game.flip_display()
             unit.health -= self.__degats # Se brûle -> Perd 5 PV
