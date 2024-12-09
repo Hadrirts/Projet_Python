@@ -1,6 +1,6 @@
 import pygame
 import sys
-from unit import *  # Importer les classes d'unités
+from unit import Canard, Fée, WIDTH, HEIGHT, WHITE, GREY, FPS  # Importer les unités et les constantes nécessaires
 
 
 class Interface:
@@ -20,7 +20,7 @@ class Interface:
         bar_x = (WIDTH - bar_width) // 2
         bar_y = (HEIGHT - bar_height) // 2
 
-        checkpoints = [0.3, 0.6, 0.8, 1.0]  # Étapes de progression (30%, 60%, 80%, 100%)
+        checkpoints = [0.3, 0.6, 0.8, 1.0]  # Étapes de progression
         current_checkpoint = 0  # Index de l'étape actuelle
         percentage = 0  # Pourcentage initial
 
@@ -39,22 +39,19 @@ class Interface:
 
             pygame.display.flip()
             
-            # Avancer progressivement jusqu'à la prochaine étape
             if percentage < checkpoints[current_checkpoint]:
-                percentage += 0.01  # Avancement progressif
+                percentage += 0.01
             else:
-                pygame.time.delay(500)  # Petite pause réaliste (500 ms)
-                current_checkpoint += 1  # Passer à l'étape suivante
+                pygame.time.delay(500)
+                current_checkpoint += 1
 
             self.clock.tick(FPS)
 
-    def choose_units(self):
-        """Permet au joueur de choisir une unité et démarre le jeu immédiatement."""
+    def choose_unit(self):
+        """Permet au joueur de choisir entre 'Canard' et 'Fée'."""
         units = [
-            {"name": "Guerrier", "class": guerrier, "description": "Unité robuste avec des compétences de mêlée."},
-            {"name": "Archer", "class": archer, "description": "Unité à distance avec des tirs précis."},
-            {"name": "Mage", "class": mage, "description": "Unité magique avec des compétences de soin."},
-            {"name": "Paladin", "class": paladin, "description": "Unité polyvalente avec des capacités défensives."}
+            {"name": "Canard", "class": Canard, "description": "Unité agile."},
+            {"name": "Fée", "class": Fée, "description": "Unité magique."}
         ]
 
         selected_index = 0
@@ -62,7 +59,7 @@ class Interface:
         while True:
             self.screen.blit(self.background_image, (0, 0))
 
-            # Afficher la liste des unités
+            # Afficher les unités disponibles
             for i, unit in enumerate(units):
                 color = WHITE if i == selected_index else GREY
                 text_surface = self.font.render(unit["name"], True, color)
@@ -86,23 +83,44 @@ class Interface:
                         selected_index = (selected_index - 1) % len(units)
                     elif event.key == pygame.K_DOWN:
                         selected_index = (selected_index + 1) % len(units)
-                    elif event.key == pygame.K_RETURN:  # Valider l'unité sélectionnée
+                    elif event.key == pygame.K_RETURN:
+                        # Retourner l'unité choisie
                         selected_unit_class = units[selected_index]["class"]
-                        return selected_unit_class(0, 0, 100, 20, "player")  # Créer une instance d'unité et la retourner
+                        return selected_unit_class(0, 0, 100, 20, "player")
 
             self.clock.tick(FPS)
 
+    def display_end_message(self, message) : 
+        """Affiche un message de fin, "You won" ou "Game Over"  """
+        self.screen.blit(self.background_image, (0, 0)) # Afficher l'image de fond 
+
+
+        # Afficher le message au centre de l'écran 
+        font = pygame.font.Font(None, 72)
+        texte_surface = font.render(message, True, WHITE)
+        text_rect = text_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+        self.screen.blit(text_surface, text_rect)
+
+        pygame.display.flip()
+
+        #Attendre un moment pour laisser le joueur lire le message 
+        pygame.time.wait(3000)
+
+        # Quitter le jeu après le message 
+        pygame.quit()
+        sys.exit()
+
+
     def display_menu(self):
-        """Affiche le menu principal avec l'option de choisir une unité et démarrer directement le jeu."""
+        """Affiche le menu principal."""
         self.countdown()
 
-        menu_items = ["Nouvelle Partie", "Quitter"]
+        menu_items = ["Nouvelle partie", "Quitter"]
         selected_index = 0
 
         while True:
             self.screen.blit(self.background_image, (0, 0))
 
-            # Afficher les options du menu
             for i, item in enumerate(menu_items):
                 color = WHITE if i == selected_index else GREY
                 text_surface = self.font.render(item, True, color)
@@ -121,8 +139,8 @@ class Interface:
                     elif event.key == pygame.K_DOWN:
                         selected_index = (selected_index + 1) % len(menu_items)
                     elif event.key == pygame.K_RETURN:
-                        if selected_index == 0:  # "Nouvelle Partie"
-                            return self.choose_units()  # Passer directement à la sélection d'unité
+                        if selected_index == 0:  # "Choisir l'unité"
+                            return self.choose_unit()
                         elif selected_index == 1:  # "Quitter"
                             pygame.quit()
                             sys.exit()
