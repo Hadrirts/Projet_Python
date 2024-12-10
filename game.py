@@ -30,10 +30,12 @@ class Game:
             La surface de la fenêtre du jeu.
         """
         self.screen = screen
+        self.win = False
+        self.lose = False
         self.player_units = [Canard(0, 0, 10, 2, 'player'),
-                             Fée(1, 0, 10, 2, 'player')]
+                             Fee(1, 0, 10, 2, 'player')]
 
-        self.enemy_units = [Fée(GRID_SIZE-1, GRID_SIZE-1, 8, 1, 'enemy'),
+        self.enemy_units = [Fee(GRID_SIZE-1, GRID_SIZE-1, 8, 1, 'enemy'),
                             Canard(GRID_SIZE-2, GRID_SIZE-1, 8, 1, 'enemy')]
         
         # Coordonnées des cases spéciales
@@ -121,6 +123,10 @@ class Game:
                                     selected_unit.attack(enemy)
                                     if enemy.health <= 0:
                                         self.enemy_units.remove(enemy)
+                                    if not(self.enemy_units): # Si il n'y a plus d'ennemis
+                                        self.win = True
+                                    else:
+                                        self.win = False
 
                             has_acted = True
                             selected_unit.is_selected = False
@@ -149,6 +155,10 @@ class Game:
                 enemy.attack(target)
                 if target.health <= 0:
                     self.player_units.remove(target)
+                if not(self.player_units): # Si il n'y a plus d'unités
+                    self.lose = True
+                else:
+                    self.lose = False
 
 
     def flip_display(self):
@@ -201,6 +211,7 @@ def main():
     while True:
         game.handle_player_turn()
         game.handle_enemy_turn()
+
 
 
 if __name__ == "__main__":

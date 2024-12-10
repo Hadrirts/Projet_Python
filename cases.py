@@ -118,8 +118,8 @@ class Lave(Case):
                 if isinstance(case,Mur):
                     murs.append(case)
             unit.move(dx, dy, murs)   # Déplacement
-            self.Game.flip_display()
             unit.health -= self.__degats # Se brûle -> Perd 5 PV
+            self.Game.flip_display()
             print(f"PV : {unit.health} (-{self.__degats})")
             print("-----------------------------")
             
