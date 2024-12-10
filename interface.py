@@ -9,18 +9,21 @@ class Interface:
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption("Page d'accueil du jeu")
         self.clock = pygame.time.Clock()
-        self.background_image = pygame.image.load("monster.jpg")
+        self.background_image = pygame.image.load("monster_haven.jpg")
         self.background_image = pygame.transform.scale(self.background_image, (WIDTH, HEIGHT))
         self.font = pygame.font.Font(None, 48)
 
     def countdown(self):
-        """Affiche un compte à rebours sous forme de barre de chargement réaliste."""
+        """Affiche un compte à rebours sous forme de barre de chargement"""
         bar_width = 400
         bar_height = 30
         bar_x = (WIDTH - bar_width) // 2
-        bar_y = (HEIGHT - bar_height) // 2
+        #bar_y = (HEIGHT - bar_height) // 2
+        bar_y = (HEIGHT * 2) // 3
 
-        checkpoints = [0.3, 0.6, 0.8, 1.0]  # Étapes de progression
+
+        #checkpoints = [0.3, 0.6, 0.8, 1.0]  # Étapes de progression
+        checkpoints = [0.0, 1.0]
         current_checkpoint = 0  # Index de l'étape actuelle
         percentage = 0  # Pourcentage initial
 
@@ -42,13 +45,13 @@ class Interface:
             if percentage < checkpoints[current_checkpoint]:
                 percentage += 0.01
             else:
-                pygame.time.delay(500)
+                pygame.time.delay(500) #was 500 
                 current_checkpoint += 1
 
             self.clock.tick(FPS)
 
     def choose_unit(self):
-        """Permet au joueur de choisir entre 'Canard' et 'Fée'."""
+        """Permet au joueur de choisir l'unité"""
         units = [
             {"name": "Canard", "class": Canard, "description": "Unité agile."},
             {"name": "Fée", "class": Fée, "description": "Unité magique."}
@@ -63,14 +66,14 @@ class Interface:
             for i, unit in enumerate(units):
                 color = WHITE if i == selected_index else GREY
                 text_surface = self.font.render(unit["name"], True, color)
-                text_rect = text_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2 + i * 60))
+                text_rect = text_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 100 + i * 60)) #was 60 # +100 ajouté 
                 self.screen.blit(text_surface, text_rect)
 
             # Afficher la description de l'unité sélectionnée
-            description = units[selected_index]["description"]
-            description_surface = self.font.render(description, True, WHITE)
-            description_rect = description_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 100))
-            self.screen.blit(description_surface, description_rect)
+            #description = units[selected_index]["description"]
+            #description_surface = self.font.render(description, True, WHITE)
+            #description_rect = description_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 150)) #was -100
+            #self.screen.blit(description_surface, description_rect)
 
             pygame.display.flip()
 
@@ -90,27 +93,6 @@ class Interface:
 
             self.clock.tick(FPS)
 
-    def display_end_message(self, message) : 
-        """Affiche un message de fin, "You won" ou "Game Over"  """
-        self.screen.blit(self.background_image, (0, 0)) # Afficher l'image de fond 
-
-
-        # Afficher le message au centre de l'écran 
-        font = pygame.font.Font(None, 72)
-        texte_surface = font.render(message, True, WHITE)
-        text_rect = text_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2))
-        self.screen.blit(text_surface, text_rect)
-
-        pygame.display.flip()
-
-        #Attendre un moment pour laisser le joueur lire le message 
-        pygame.time.wait(3000)
-
-        # Quitter le jeu après le message 
-        pygame.quit()
-        sys.exit()
-
-
     def display_menu(self):
         """Affiche le menu principal."""
         self.countdown()
@@ -124,7 +106,8 @@ class Interface:
             for i, item in enumerate(menu_items):
                 color = WHITE if i == selected_index else GREY
                 text_surface = self.font.render(item, True, color)
-                text_rect = text_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2 + i * 60))
+                #text_rect = text_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2 + i * 60))
+                text_rect = text_surface.get_rect(center=(WIDTH // 2, HEIGHT * 2 // 3 + i * 60))
                 self.screen.blit(text_surface, text_rect)
 
             pygame.display.flip()
