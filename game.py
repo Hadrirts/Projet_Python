@@ -178,27 +178,25 @@ class Game:
         # Rafraîchit l'écran
         pygame.display.flip()
 
-def display_end_message(self, message):
-    """Affiche un message de fin, uniquement 'You won' ou 'Game Over'"""
-    #self.screen.fill(BLACK)  
+    def display_end_message(self, message):
+        """Affiche un message de fin, uniquement 'You won' ou 'Game Over'"""
+        #self.screen.fill(BLACK)  
 
-    # Afficher le message au centre de l'écran
-    font = pygame.font.Font(None, 72)
-    text_surface = font.render(message, True, WHITE)
-    text_rect = text_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2))
-    self.screen.blit(text_surface, text_rect)
+        # Afficher le message au centre de l'écran
+        font = pygame.font.Font(None, 72)
+        text_surface = font.render(message, True, WHITE)
+        text_rect = text_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+        self.screen.blit(text_surface, text_rect)
 
-    pygame.display.flip()
+        pygame.display.flip()
 
-    # Attendre un moment pour laisser le joueur lire le message
-    pygame.time.wait(3000)
+        # Attendre un moment pour laisser le joueur lire le message
+        pygame.time.wait(3000)
 
-    # Quitter le jeu après le message
-    pygame.quit()
-    sys.exit()
+        # Quitter le jeu après le message
+        pygame.quit()
 
-
-
+        sys.exit()
 
 def main():
 
