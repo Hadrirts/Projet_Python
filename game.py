@@ -31,9 +31,9 @@ class Game:
         """
         self.screen = screen
         self.player_units = [Canard(0, 0, 10, 2, 'player'),
-                             Fée(1, 0, 10, 2, 'player')]
+                             Fee(1, 0, 10, 2, 'player')]
 
-        self.enemy_units = [Fée(GRID_SIZE-1, GRID_SIZE-1, 8, 1, 'enemy'),
+        self.enemy_units = [Fee(GRID_SIZE-1, GRID_SIZE-1, 8, 1, 'enemy'),
                             Canard(GRID_SIZE-2, GRID_SIZE-1, 8, 1, 'enemy')]
         
         # Coordonnées des cases spéciales
@@ -104,10 +104,8 @@ class Game:
                         
                         for case in self.cases:
                             if case.rect.collidepoint(selected_unit.x * CELL_SIZE, selected_unit.y * CELL_SIZE):  # Si l'unité est dans une case spéciale
-                                if isinstance(case,Lave):  # Si l'
-                                    case.effect(selected_unit,self.cases) # Applique les effets de la case
-                                else:
-                                    case.effect(selected_unit)   # Applique les effets de la case
+                                case.effect(selected_unit,self.cases) # Applique les effets de la case
+
                                 has_acted = case.next        
                                 selected_unit.is_selected = not(case.next)
                                 break
@@ -121,6 +119,7 @@ class Game:
                                     selected_unit.attack(enemy)
                                     if enemy.health <= 0:
                                         self.enemy_units.remove(enemy)
+                                        print("Enemy unit died ;)")
 
                             has_acted = True
                             selected_unit.is_selected = False
@@ -138,10 +137,7 @@ class Game:
             # Effets des cases
             for case in self.cases:
                 if case.rect.collidepoint(enemy.x * CELL_SIZE, enemy.y * CELL_SIZE):  # Si l'unité est dans une case spéciale
-                    if isinstance(case,Lave):
-                        case.effect(enemy,self.mur) # Applique les effets de la case
-                    else:
-                        case.effect(enemy)   # Applique les effets de la case
+                    case.effect(enemy)   # Applique les effets de la case
                     break
 
             # Attaque si possible
@@ -149,6 +145,8 @@ class Game:
                 enemy.attack(target)
                 if target.health <= 0:
                     self.player_units.remove(target)
+                    print("Team unit died :/")  
+
 
 
     def flip_display(self):
@@ -174,9 +172,35 @@ class Game:
         # Affiche les unités
         for unit in self.player_units + self.enemy_units:
             unit.draw(self.screen)
-
+        
         # Rafraîchit l'écran
         pygame.display.flip()
+        if not(self.enemy_units) :
+            print("All enemy units died!")
+            self.display_end_message("You won!")
+            
+        if not(self.player_units) :
+            print("All team units died :(")
+            self.display_end_message("Game Over")
+
+    def display_end_message(self, message):
+        """Affiche un message de fin, uniquement 'You won' ou 'Game Over'"""
+        #self.screen.fill(BLACK)  
+    
+        # Afficher le message au centre de l'écran
+        font = pygame.font.Font(None, 72)
+        text_surface = font.render(message, True, WHITE)
+        text_rect = text_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+        self.screen.blit(text_surface, text_rect)
+    
+        pygame.display.flip()
+    
+        # Attendre un moment pour laisser le joueur lire le message
+        pygame.time.wait(3000)
+    
+        # Quitter le jeu après le message
+        pygame.quit()
+        sys.exit()
 
     def display_end_message(self, message):
         """Affiche un message de fin, uniquement 'You won' ou 'Game Over'"""
@@ -220,6 +244,7 @@ def main():
     while True:
         game.handle_player_turn()
         game.handle_enemy_turn()
+
 
 
 if __name__ == "__main__":
