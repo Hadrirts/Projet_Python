@@ -125,12 +125,13 @@ class Canard(Unit):
     def __init__(self, x, y, health, attack_power, team):
         super().__init__(x, y, health, attack_power, team)
         self.image = "canard.png" if self.team == 'player' else "evil_canard.png"
+        self.competences = competences.BouleDeFeu()
         
 class Fee(Unit):
     def __init__(self, x, y, health, attack_power, team):
         super().__init__(x, y, health, attack_power, team)
         self.image = "fee.png" if self.team == 'player' else "evil_fee.png"
-        
+        self.competences = competences.Tir()
         
 class guerrier(Unit):
     def __init__(self, x, y, health, attack_power, team):
