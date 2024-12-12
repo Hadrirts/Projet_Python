@@ -104,12 +104,13 @@ class Lave(Case):
                    dy = random.choice([-1,0,1])
                 safe = True
                 for case in cases:
-                    if case.rect.collidepoint((unit.x+dx) * CELL_SIZE, (unit.y+dy) * CELL_SIZE): # Eviter que l'unit aterrisse dans une autre case spéciale
+                    # Eviter que l'unité aterrisse dans une autre case spéciale ou en dehors du jeu
+                    if case.rect.collidepoint((unit.x+dx) * CELL_SIZE, (unit.y+dy) * CELL_SIZE) or not(0 <= unit.x + dx < GRID_SIZE) or not(0 <= unit.y + dy < GRID_SIZE): 
                         safe = False
-                        break  # Sortir de la boucle for 
+                        break  # Sortir de la boucle for et chercher une autre case
                     
                 if safe == True: # Si la case est libre
-                    break  # Sortir de la boucle while
+                    break  # Sortir de la boucle while pour faire bouger l'unité
                 
             
             pygame.time.delay(100)
@@ -118,44 +119,47 @@ class Lave(Case):
                 if isinstance(case,Mur):
                     murs.append(case)
             unit.move(dx, dy, murs)   # Déplacement
-            self.Game.flip_display()
             unit.health -= self.__degats # Se brûle -> Perd 5 PV
-            print(f"PV : {unit.health} (-{self.__degats})")
-            print("-----------------------------")
+            self.Game.flip_display()
             
             if  unit.health <= 0:                # Si l'unité a perdu tout ses PV
                 self.Game.player_units.remove(unit)  # Retirer l'unité
-                print("Dead")               
-                self.Game.flip_display()
+                if unit.team == "player":
+                    print("Team unit died :/")  
+                elif unit.team == "enemy":
+                    print("Enemy unit died ;)")
                 self.next = True # Passer à l'unité suivante
+                
+            self.Game.flip_display()
                 
 
 class Guerison(Case):
     def __init__(self,x,y,Game):
         super().__init__(x,y,Game)
         #self.color = BEIGE
-        self.image = pygame.image.load("healing.png")
+        self.image = pygame.image.load("coeur.png")
         self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE)) # redimensionner l'image
-        self.__healing = 5
+        #self.__healing = 5
         
     @property
     def healing(self):
         return self.__healing
     
-    def effect(self,unit):
+    def effect(self,unit,cases):
         self.next = False  # Pas de guérison -> rester sur l'unité
         if self.rect.collidepoint(unit.x * CELL_SIZE, unit.y * CELL_SIZE):  # Si Unit est dans une zone de guérison
 
-            if unit.health + self.__healing > unit.health_max :
-                unit.health = unit.health_max   # PV max
-            else :
-                unit.health += self.__healing   # Guérit -> Gagne PV
+            # if unit.health + self.__healing > unit.health_max :
+            unit.health = unit.health_max   # PV max
+            # else :
+            #     unit.health += self.__healing   # Guérit -> Gagne PV
                 
-            print(f"PV : {unit.health} (+{self.__healing})")
+            print(f"Healed, PV : {unit.health_max}")
             print("-----------------------------")
             
+            cases.remove(self)
             self.Game.flip_display()
-            self.next = True  # Guérison active -> passer à l'unité suivante
+
         
 
 class Mur(Case):

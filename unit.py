@@ -12,6 +12,7 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
+PURPLE = (150, 0, 200)
 GREEN = (0, 255, 0)
 
 BEIGE = (240,210,180)
@@ -104,14 +105,19 @@ class Unit:
         """Affiche l'unité sur l'écran."""
         #color = BLUE if self.team == 'player' else RED
         if self.is_selected:
-            pygame.draw.rect(screen, GREEN, (self.x * CELL_SIZE,
-                             self.y * CELL_SIZE, CELL_SIZE, CELL_SIZE))
-        # pygame.draw.circle(screen, color, (self.x * CELL_SIZE + CELL_SIZE //
-        #                    2, self.y * CELL_SIZE + CELL_SIZE // 2), CELL_SIZE // 3)
+            # pygame.draw.rect(screen, GREEN, (self.x * CELL_SIZE,
+            #                  (self.y) * CELL_SIZE + CELL_SIZE, CELL_SIZE, 4))
+            pygame.draw.circle(screen, GREEN, (self.x * CELL_SIZE + CELL_SIZE //
+                                2, self.y * CELL_SIZE + CELL_SIZE // 2), CELL_SIZE // 3)
         picture = pygame.image.load(self.image)
         picture = pygame.transform.scale(picture, (CELL_SIZE, CELL_SIZE)) # redimensionner l'image
         screen.blit(picture,(self.x * CELL_SIZE,self.y * CELL_SIZE)) # afficher l'image
-        pygame.draw.rect(screen, RED, (self.x * CELL_SIZE,self.y * CELL_SIZE, round(CELL_SIZE * self.health/self.health_max), 3 )) # Barre de santé
+        
+        # Barre de santé
+        pygame.draw.rect(screen, PURPLE, (self.x * CELL_SIZE,self.y * CELL_SIZE - 3, round(CELL_SIZE * self.health/self.health_max), 6 ))
+        pygame.draw.line(screen, WHITE, (self.x * CELL_SIZE,self.y * CELL_SIZE -1), (round((self.health/self.health_max + self.x) * CELL_SIZE)-1,self.y * CELL_SIZE - 1), width=1)
+        pygame.draw.rect(screen, BLACK, (self.x * CELL_SIZE,self.y * CELL_SIZE - 3, CELL_SIZE, 6 ),1)
+        
         
         
 # Test Hadriel:
@@ -120,7 +126,7 @@ class Canard(Unit):
         super().__init__(x, y, health, attack_power, team)
         self.image = "canard.png" if self.team == 'player' else "evil_canard.png"
         
-class Fée(Unit):
+class Fee(Unit):
     def __init__(self, x, y, health, attack_power, team):
         super().__init__(x, y, health, attack_power, team)
         self.image = "fee.png" if self.team == 'player' else "evil_fee.png"
