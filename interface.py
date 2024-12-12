@@ -43,12 +43,12 @@ class Interface:
             pygame.display.flip()
             
             if percentage < checkpoints[current_checkpoint]:
-                percentage += 0.01
+                percentage += 0.0167 # was 0.01 
             else:
                 pygame.time.delay(500) #was 500 
                 current_checkpoint += 1
 
-            self.clock.tick(FPS)
+            self.clock.tick(60) # was FPS 
 
     def choose_unit(self, num_units_to_select=2):
         """Permet au joueur de choisir l'unité"""
@@ -56,6 +56,11 @@ class Interface:
             {"name": "Canard", "class": Canard, "description": "Unité agile."},
             {"name": "Fée", "class": Fée, "description": "Unité magique."}
         ]
+
+        #charger les images des unités 
+        #for unit in units:
+            #unit["icon"] = pygame.image.load(unit["image"])
+            #unit["icon"] = pygame.transform.scale(unit["icon"], (50, 50))
 
         selected_index = 0
         selected_units = [] #stocker les unités choisies 
@@ -72,6 +77,11 @@ class Interface:
                 text_rect = text_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 100 + i * 60 + oscillation_offset)) #was 60 # +100 ajouté 
                 self.screen.blit(text_surface, text_rect)
 
+            # Afficher l'image de l'unité
+            #icon_x = WIDTH // 2 - 100  # Décaler l'icône à gauche du texte
+            #icon_y = HEIGHT // 2 + 90 + i * 70 + oscillation_offset
+            #self.screen.blit(unit["icon"], (icon_x, icon_y))
+
             # Afficher la description de l'unité sélectionnée
             #description = units[selected_index]["description"]
             #description_surface = self.font.render(description, True, WHITE)
@@ -81,7 +91,8 @@ class Interface:
             # Afficher les unités déjà sélectionnées
             selected_text = f"Sélectionnées ({len(selected_units)}/{num_units_to_select}): " + ", ".join([unit["name"] for unit in selected_units])
             selected_surface = self.font.render(selected_text, True, WHITE)
-            selected_rect = selected_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 150))
+            #selected_rect = selected_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 150))
+            selected_rect = selected_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 50 + oscillation_offset))
             self.screen.blit(selected_surface, selected_rect)
 
             pygame.display.flip()

@@ -197,8 +197,19 @@ class Game:
         pygame.quit()
 
         sys.exit()
+    
+
+    
 
 def main():
+
+    pygame.init()
+    pygame.mixer.init()
+
+    # Jouer une musique de fond
+    pygame.mixer.music.load("son_interface.mp3")
+    pygame.mixer.music.play(-1)
+    pygame.mixer.music.set_volume(0.5)  # Ajuster le volume
 
     # Créer une instance de l'interface
     interface = Interface()
