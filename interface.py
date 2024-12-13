@@ -113,7 +113,7 @@ class Interface:
                         selected_unit_class = units[selected_index]["class"]
                         selected_units.append({
                         "name": units[selected_index]["name"],
-                        "unit": selected_unit_class(ix, 0, 20, 2, "player")
+                        "unit": selected_unit_class(ix, 0, 20, 2, 10,"player")
                     })
                         ix += 1
             frame += 1 #Incrémenter le compteur 

@@ -18,7 +18,7 @@ class BouleDeFeu(Competence):
     def __init__(self):
         super().__init__("Boule de feu", 10, 3, "skillshot", 3)
         self.zone_type = "cercle"
-        self.rayon = 2
+        self.rayon = 1
 
     def utiliser(self, caster, x, y, enemy_units):
         """Utilise la boule de feu, affectant une zone circulaire autour de la cible."""
@@ -28,7 +28,7 @@ class BouleDeFeu(Competence):
                 unit.health -= self.degats
                 if unit.health <= 0:
                     enemy_units.remove(unit)
-            print(f"utilise {self.nom} et touche {len(affected_units)} unités dans la zone circulaire, causant {self.degats} dégâts.")
+            print(f"utilise {self.nom} et touche {len(affected_units)} unités dans la zone circulaire")
 
     def get_units_in_cercle(self, x, y, enemy_units):
         """Retourne les unités dans une zone circulaire autour de la cible."""
@@ -51,7 +51,7 @@ class Tir(Competence):
             unit.health -= self.degats
             if unit.health <= 0:
                 enemy_units.remove(unit)
-        return f"utilise {self.nom} et touche {len(affected_units)} unités dans la direction {direction_active}, causant {self.degats} dégâts."
+        return f"utilise {self.nom} et touche {len(affected_units)} unités dans la direction {direction_active}."
 
     def get_units_in_ligne(self, caster, enemy_units, direction_active):
         """
@@ -103,7 +103,7 @@ class Spin(Competence):
         affected_units = self.get_units_in_cercle(caster, target, enemy_units)
         for unit in affected_units:
             unit.health -= self.degats
-        return f"{caster.name} utilise {self.nom} et touche {len(affected_units)} unités dans la zone circulaire, causant {self.degats} dégâts."
+        return f"{caster.name} utilise {self.nom} et touche {len(affected_units)} unités dans la zone circulaire."
 
     def get_units_in_cercle(self, caster, target, enemy_units):
         """Retourne les unités dans une zone circulaire autour du caster."""

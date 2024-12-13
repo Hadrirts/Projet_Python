@@ -52,7 +52,7 @@ class Unit:
         Dessine l'unité sur la grille.
     """
 
-    def __init__(self, x, y, health, attack_power, team):
+    def __init__(self, x, y, health, attack_power, speed, team):
         """
         Construit une unité avec une position, une santé, une puissance d'attaque et une équipe.
 
@@ -76,25 +76,42 @@ class Unit:
         self.attack_power = attack_power
         self.team = team  # 'player' ou 'enemy'
         self.is_selected = False
-        
+
+        self.speed = speed
+        self.pos_debut_tour = (x, y)  # Position au début du tour
+        self.cases_acces = set()  # Zone atteignable précalculée
 
     @property
     def health_max(self):   
         return self.__health_max
     
-    def move(self, dx, dy,murs):
-        """Déplace l'unité de dx, dy."""
-        if 0 <= self.x + dx < GRID_SIZE and 0 <= self.y + dy < GRID_SIZE:
-            
-        # Gestion des murs
+    def calcule_zone_mov(self):
+        """
+        Précalcule la zone accessible depuis la position actuelle.
+        """
+        self.cases_acces = set()
+        for x in range(self.pos_debut_tour[0] - self.speed, self.pos_debut_tour[0] + self.speed + 1):
+            for y in range(self.pos_debut_tour[1] - self.speed, self.pos_debut_tour[1] + self.speed + 1):
+                if (0 <= x < WIDTH // CELL_SIZE and
+                    0 <= y < HEIGHT // CELL_SIZE and
+                    abs(x - self.pos_debut_tour[0]) + abs(y - self.pos_debut_tour[1]) <= self.speed):
+                    self.cases_acces.add((x, y))
+
+    def move(self, dx, dy, murs):
+        """
+        Déplace l'unité de dx, dy si la position est atteignable.
+        """
+        new_x, new_y = self.x + dx, self.y + dy
+        can_move_to = (new_x, new_y) in self.cases_acces # Vérification avec la zone précalculée
+        if can_move_to:  
             mur_ok = False
             for mur in murs:                     
-                if mur.effect(self,dx,dy):   # Si l'unité rencontre un mur
+                if mur.effect(self, dx, dy):  # Si l'unité rencontre un mur
                     mur_ok = True
                     break
-            if mur_ok == False:   # Si il n'y a pas de mur
-                self.x += dx
-                self.y += dy
+            if not mur_ok:  # Si aucun mur n'empêche le mouvement
+                self.x = new_x
+                self.y = new_y
 
     def attack(self, target):
         """Attaque une unité cible."""
@@ -103,10 +120,7 @@ class Unit:
 
     def draw(self, screen):
         """Affiche l'unité sur l'écran."""
-        #color = BLUE if self.team == 'player' else RED
         if self.is_selected:
-            # pygame.draw.rect(screen, GREEN, (self.x * CELL_SIZE,
-            #                  (self.y) * CELL_SIZE + CELL_SIZE, CELL_SIZE, 4))
             pygame.draw.circle(screen, GREEN, (self.x * CELL_SIZE + CELL_SIZE //
                                 2, self.y * CELL_SIZE + CELL_SIZE // 2), CELL_SIZE // 3)
         picture = pygame.image.load(self.image)
@@ -122,30 +136,32 @@ class Unit:
         
 # Test Hadriel:
 class Canard(Unit):
-    def __init__(self, x, y, health, attack_power, team):
-        super().__init__(x, y, health, attack_power, team)
+    def __init__(self, x, y, health, attack_power, speed, team):
+        super().__init__(x, y, health, attack_power, speed, team)
         self.image = "canard.png" if self.team == 'player' else "evil_canard.png"
         self.competences = competences.BouleDeFeu()
         
 class Fee(Unit):
-    def __init__(self, x, y, health, attack_power, team):
-        super().__init__(x, y, health, attack_power, team)
+    def __init__(self, x, y, health, attack_power, speed, team):
+        super().__init__(x, y, health, attack_power, speed, team)
         self.image = "fee.png" if self.team == 'player' else "evil_fee.png"
         self.competences = competences.Tir()
         
 class guerrier(Unit):
-    def __init__(self, x, y, health, attack_power, team):
-        super().__init__(x, y, health, attack_power, team)
+    def __init__(self, x, y, health, attack_power, speed, team):
+        super().__init__(x, y, health, attack_power, speed, team)
         self.competences = competences.Spin()
 class archer(Unit):
-    def __init__(self, x, y, health, attack_power, team):
-        super().__init__(x, y, health, attack_power, team)
+    def __init__(self, x, y, health, attack_power, speed, team):
+        super().__init__(x, y, health, attack_power, speed, team)
         self.competences = competences.Tir()
+
 class mage(Unit):
-    def __init__(self, x, y, health, attack_power, team):
-        super().__init__(x, y, health, attack_power, team)#x,y,60,20,team
+    def __init__(self, x, y, health, attack_power, speed, team):
+        super().__init__(x, y, health, attack_power, speed, team)
         self.competences = competences.BouleDeFeu()
+
 class paladin(Unit):
-    def __init__(self, x, y, health, attack_power, team):
-        super().__init__(x, y, health, attack_power, team)
+    def __init__(self, x, y, health, attack_power, speed, team):
+        super().__init__(x, y, health, attack_power, speed, team)
         self.competences = competences.Soin()

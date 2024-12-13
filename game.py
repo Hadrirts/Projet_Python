@@ -32,10 +32,11 @@ class Game:
         self.screen = screen
         self.player_units = [] # à choisir dans l'interface
 
-        self.enemy_units = [Fee(GRID_SIZE-1, GRID_SIZE-1, 8, 1, 'enemy'),
-                            Canard(GRID_SIZE-2, GRID_SIZE-1, 8, 1, 'enemy')]
+        self.enemy_units = [Fee(GRID_SIZE-1, GRID_SIZE-1, 8, 1, 5, 'enemy'),
+                            Canard(GRID_SIZE-2, GRID_SIZE-1, 8, 1, 5, 'enemy')]
         
         # Coordonnées des cases spéciales
+
         lave_coord = []
         guerison_coord = [[6,6],[3,3],[9,3],[3,9],[9,9]]
         mur_coord = [[2,2],[2,3],[3,2],[9,2],[10,2],[10,3],[2,9],[2,10],[3,10],[10,9],[10,10],[9,10],
@@ -77,7 +78,7 @@ class Game:
                             y = max(0, y - 1)
                         elif event.key == pygame.K_DOWN and np.sqrt((x - unit.x)**2 + (y - unit.y + 1)**2) <= competence.portee:
                             y = min(HEIGHT // CELL_SIZE - 1, y + 1)
-                        elif event.key == pygame.K_RETURN:  # Confirmer la visée
+                        elif event.key == pygame.K_SPACE:  # Confirmer la visée
                             competence.utiliser(unit,x,y, self.enemy_units)
                             viser = False
                         elif event.key == pygame.K_ESCAPE:  # Annuler
@@ -92,7 +93,7 @@ class Game:
                             direction_active = "haut"
                         elif event.key == pygame.K_DOWN:
                             direction_active = "bas"
-                        elif event.key == pygame.K_RETURN:  # Confirmer la visée
+                        elif event.key == pygame.K_SPACE:  # Confirmer la visée
                             competence.utiliser(unit, self.enemy_units,direction_active)
                             viser = False
                         elif event.key == pygame.K_ESCAPE:  # Annuler
@@ -112,7 +113,7 @@ class Game:
                         if 0 <= case_x < WIDTH // CELL_SIZE and 0 <= case_y < HEIGHT // CELL_SIZE:
                             rect = pygame.Rect(case_x * CELL_SIZE, case_y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
                             pygame.draw.rect(self.aim_surface, (128, 128, 128, 100), rect)
-            # Dessine la zone circulaire de visée en rouge
+            # Dessine la zone circulaire de visée
             for x in range(-rayon, rayon + 1):
                 for y in range(-rayon, rayon + 1):
                     distance = np.sqrt(x**2 + y**2)
@@ -124,7 +125,7 @@ class Game:
                             pygame.draw.rect(self.aim_surface, (255, 0, 0, 200), rect)
 
         elif competence.zone_type == "ligne":
-            # Affiche la zone de déplacement valide
+            # Affiche la zone de visée valide
             directions = {"droite": (1, 0),
                           "gauche": (-1, 0),
                           "bas": (0, 1),
@@ -141,6 +142,16 @@ class Game:
                         else:
                             pygame.draw.rect(self.aim_surface, (255, 255, 0, 100), rect)  # Jaune pour les autres         
 
+    def show_moveable_area(self, unit):
+        """
+        Dessine la zone atteignable calculée.
+        """
+        self.aim_surface.fill((0,0,0,0))
+
+        for tile in unit.cases_acces:
+            x, y = tile
+            rect = pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+            pygame.draw.rect(self.aim_surface, (0, 255, 0, 100), rect)
 
     def handle_player_turn(self):
         """Tour du joueur"""
@@ -149,9 +160,10 @@ class Game:
             # Tant que l'unité n'a pas terminé son tour
             has_acted = False
             selected_unit.is_selected = True
-            self.flip_display()
+            selected_unit.calcule_zone_mov()
+            self.show_moveable_area(selected_unit)
+            self.flip_display(moving=True)  # Met à jour l'écran de jeu
             while not has_acted:
-
                 # Important: cette boucle permet de gérer les événements Pygame
                 for event in pygame.event.get():
 
@@ -176,7 +188,7 @@ class Game:
                             
                         selected_unit.move(dx, dy,self.mur) 
                         
-                        self.flip_display() # Met à jour l'écran de jeu
+                        self.flip_display(moving=True) # Met à jour l'écran de jeu
                         
                         
                         for case in self.cases:
@@ -222,7 +234,7 @@ class Game:
 
 
 
-    def flip_display(self, viser_mode=False):
+    def flip_display(self, viser_mode=False, moving=False):
         """Affiche le jeu."""
 
         # Affiche le background
@@ -230,14 +242,6 @@ class Game:
         background = pygame.image.load("sol.png") 
         background = pygame.transform.scale(background, (WIDTH, HEIGHT)) 
         self.screen.blit(background,(0,0)) 
-
-        # # Affiche la grille
-        # for x in range(0, WIDTH, CELL_SIZE):
-        #     for y in range(0, HEIGHT, CELL_SIZE):
-        #         self.rect = pygame.Rect(x, y, CELL_SIZE, CELL_SIZE)
-        #         pygame.draw.rect(self.screen, WHITE, self.rect, 1)
-                
-        # Affiche les cases spéciales
         
         for case in self.cases :
             case.draw(self.screen)       
@@ -245,7 +249,10 @@ class Game:
         # Affiche les unités
         for unit in self.player_units + self.enemy_units:
             unit.draw(self.screen)
-        
+
+        if(moving):
+            self.screen.blit(self.aim_surface, (0, 0))
+
         if(viser_mode):
             # Affiche la surface de visée sur l'écran
             self.screen.blit(self.aim_surface, (0, 0))
