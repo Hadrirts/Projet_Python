@@ -120,7 +120,7 @@ class Lave(Case):
                     murs.append(case)
             unit.move(dx, dy, murs)   # Déplacement
             unit.health -= self.__degats # Se brûle -> Perd 5 PV
-            self.Game.flip_display()
+            self.Game.flip_display(moving=True)
             
             if  unit.health <= 0:                # Si l'unité a perdu tout ses PV
                 self.Game.player_units.remove(unit)  # Retirer l'unité
@@ -130,7 +130,7 @@ class Lave(Case):
                     print("Enemy unit died ;)")
                 self.next = True # Passer à l'unité suivante
                 
-            self.Game.flip_display()
+            self.Game.flip_display(moving=True)
                 
 
 class Guerison(Case):
@@ -165,7 +165,6 @@ class Guerison(Case):
 class Mur(Case):
     def __init__(self,x,y,Game):
         super().__init__(x,y,Game)
-       # self.color = GREY
         self.image = pygame.image.load("mur.png")
         self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE)) # redimensionner l'image
     

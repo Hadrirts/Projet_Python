@@ -1,5 +1,4 @@
 import pygame
-import random
 import competences
 
 # Constantes
@@ -112,6 +111,7 @@ class Unit:
             if not mur_ok:  # Si aucun mur n'empêche le mouvement
                 self.x = new_x
                 self.y = new_y
+        self.pos_debut_tour = (self.x, self.y)  # Mettre à jour la position de début de tour
 
     def attack(self, target):
         """Attaque une unité cible."""
@@ -139,13 +139,13 @@ class Canard(Unit):
     def __init__(self, x, y, health, attack_power, speed, team):
         super().__init__(x, y, health, attack_power, speed, team)
         self.image = "canard.png" if self.team == 'player' else "evil_canard.png"
-        self.competences = competences.BouleDeFeu()
+        self.competences = competences.Spin()
         
 class Fee(Unit):
     def __init__(self, x, y, health, attack_power, speed, team):
         super().__init__(x, y, health, attack_power, speed, team)
         self.image = "fee.png" if self.team == 'player' else "evil_fee.png"
-        self.competences = competences.Tir()
+        self.competences = competences.Soin()
         
 class guerrier(Unit):
     def __init__(self, x, y, health, attack_power, speed, team):

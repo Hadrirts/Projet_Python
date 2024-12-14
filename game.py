@@ -96,14 +96,24 @@ class Game:
                         elif event.key == pygame.K_SPACE:  # Confirmer la visée
                             competence.utiliser(unit, self.enemy_units,direction_active)
                             viser = False
-                        elif event.key == pygame.K_ESCAPE:  # Annuler
+                        elif event.key == pygame.K_RETURN:  # Annuler
                             viser = False
+                elif competence.zone_type == "zone":
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_SPACE:  # Confirmer la visée
+                            if competence.nom == "Soin":
+                                competence.utiliser(unit, self.player_units)
+                            else:
+                                competence.utiliser(unit, self.enemy_units)
+                            viser = False
+                        elif event.key == pygame.K_RETURN:  # Annuler
+                            viser = False
+                        
 
     def afficher_zone_visee(self,unit, target_x, target_y, competence, direction_active = None):
         self.aim_surface.fill((0, 0, 0, 0))
-        if competence.zone_type == "cercle":
-            rayon = competence.rayon
-            # Affiche la zone de déplacement valide
+        if competence.zone_type != "ligne":
+            # Affiche la zone valide
             for x in range(-competence.portee, competence.portee + 1):
                 for y in range(-competence.portee, competence.portee + 1):
                     distance = np.sqrt(x**2 + y**2)
@@ -113,18 +123,19 @@ class Game:
                         if 0 <= case_x < WIDTH // CELL_SIZE and 0 <= case_y < HEIGHT // CELL_SIZE:
                             rect = pygame.Rect(case_x * CELL_SIZE, case_y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
                             pygame.draw.rect(self.aim_surface, (128, 128, 128, 100), rect)
-            # Dessine la zone circulaire de visée
-            for x in range(-rayon, rayon + 1):
-                for y in range(-rayon, rayon + 1):
-                    distance = np.sqrt(x**2 + y**2)
-                    if distance <= rayon:
-                        case_x = target_x + x
-                        case_y = target_y + y
-                        if 0 <= case_x < WIDTH // CELL_SIZE and 0 <= case_y < HEIGHT // CELL_SIZE:
-                            rect = pygame.Rect(case_x * CELL_SIZE, case_y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
-                            pygame.draw.rect(self.aim_surface, (255, 0, 0, 200), rect)
-
-        elif competence.zone_type == "ligne":
+            if competence.zone_type == "cercle":
+                rayon = competence.rayon
+                # Dessine la zone circulaire de visée
+                for x in range(-rayon, rayon + 1):
+                    for y in range(-rayon, rayon + 1):
+                        distance = np.sqrt(x**2 + y**2)
+                        if distance <= rayon:
+                            case_x = target_x + x
+                            case_y = target_y + y
+                            if 0 <= case_x < WIDTH // CELL_SIZE and 0 <= case_y < HEIGHT // CELL_SIZE:
+                                rect = pygame.Rect(case_x * CELL_SIZE, case_y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+                                pygame.draw.rect(self.aim_surface, (255, 0, 0, 200), rect)
+        else:
             # Affiche la zone de visée valide
             directions = {"droite": (1, 0),
                           "gauche": (-1, 0),
@@ -140,7 +151,7 @@ class Game:
                         if direction == direction_active:
                             pygame.draw.rect(self.aim_surface, (255, 0, 0, 200), rect)  # Rouge pour la direction active
                         else:
-                            pygame.draw.rect(self.aim_surface, (255, 255, 0, 100), rect)  # Jaune pour les autres         
+                            pygame.draw.rect(self.aim_surface, (128, 128, 128, 100), rect)  # Jaune pour les autres    
 
     def show_moveable_area(self, unit):
         """
@@ -151,7 +162,7 @@ class Game:
         for tile in unit.cases_acces:
             x, y = tile
             rect = pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
-            pygame.draw.rect(self.aim_surface, (0, 255, 0, 100), rect)
+            pygame.draw.rect(self.aim_surface, (0, 255, 0, 30), rect)
 
     def handle_player_turn(self):
         """Tour du joueur"""
@@ -203,8 +214,7 @@ class Game:
                         if event.key == pygame.K_SPACE:
                             #utilisation de la compétence
                             competence = selected_unit.competences
-                            if competence.type_competence == "skillshot":
-                                self.use_skillshot(selected_unit, competence)
+                            self.use_skillshot(selected_unit, competence)
                             has_acted = True
                             selected_unit.is_selected = False
 
