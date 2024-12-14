@@ -1,6 +1,6 @@
 import pygame
 import sys
-from unit import Canard, Fee, WIDTH, HEIGHT, WHITE, GREY, FPS  # Importer les unités et les constantes nécessaires
+from unit import Archer, Paladin, Guerrier, Mage, WIDTH, HEIGHT, WHITE, GREY, FPS #Canard, Fee, # Importer les unités et les constantes nécessaires
 import math
 
 class Interface:
@@ -53,14 +53,18 @@ class Interface:
     def choose_unit(self, num_units_to_select=2):
         """Permet au joueur de choisir l'unité"""
         units = [
-            {"name": "Canard", "class": Canard, "description": "Unité agile.", "image": "canard.png"},
-            {"name": "Fée", "class": Fee, "description": "Unité magique.", "image": "fee.png"}
+            {"name": "Paladin", "class": Paladin, "description": "Unité agile.", "image": "paladin.png"},
+            {"name": "Archer", "class": Archer, "description": "Unité magique.", "image": "archer.png"},
+            {"name": "Guerrier", "class": Guerrier, "description": "Unité magique.", "image": "guerrier.png"},
+            {"name": "Mage", "class": Mage, "description": "Unité magique.", "image": "mage.png"},
+            # {"name": "Canard", "class": Canard, "description": "Unité agile.", "image": "canard.png"},
+            # {"name": "Fee", "class": Fee, "description": "Unité magique.", "image": "fee.png"},
         ]
         
         #charger les images des unités 
         for unit in units:
             unit["icon"] = pygame.image.load(unit["image"])
-            unit["icon"] = pygame.transform.scale(unit["icon"], (200, 200))
+            unit["icon"] = pygame.transform.scale(unit["icon"], (250, 250))
 
 
         selected_index = 0
@@ -78,12 +82,7 @@ class Interface:
                 text_rect = text_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 100 + i * 60 + oscillation_offset)) #was 60 # +100 ajouté 
                 self.screen.blit(text_surface, text_rect)
                 if i == selected_index :
-                    self.screen.blit(unit["icon"], (50,450))
-                    
-            # # Afficher l'image de l'unité
-            # icon_x = WIDTH // 2 - 100  # Décaler l'icône à gauche du texte
-            # icon_y = HEIGHT // 2 + 90 + i * 70 + oscillation_offset
-            # self.screen.blit(unit["icon"], (icon_x, icon_y))
+                    self.screen.blit(unit["icon"], (0,415)) # Affichage de l'iconde de l'unité
 
             # Afficher la description de l'unité sélectionnée
             #description = units[selected_index]["description"]

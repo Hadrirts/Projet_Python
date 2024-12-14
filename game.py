@@ -32,8 +32,8 @@ class Game:
         self.screen = screen
         self.player_units = [] # à choisir dans l'interface
 
-        self.enemy_units = [Fee(GRID_SIZE-1, GRID_SIZE-1, 8, 1, 5, 'enemy'),
-                            Canard(GRID_SIZE-2, GRID_SIZE-1, 8, 1, 5, 'enemy')]
+        self.enemy_units = [Paladin(GRID_SIZE-1, GRID_SIZE-1, 8, 1, 5, 'enemy'),
+                            Archer(GRID_SIZE-2, GRID_SIZE-1, 8, 1, 5, 'enemy')]
         
         # Coordonnées des cases spéciales
 
