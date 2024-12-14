@@ -32,7 +32,7 @@ class Unit:
         La position y de l'unité sur la grille.
     health : int
         La santé de l'unité.
-    health_max : int                    ###################################
+    health_max : int                  
         La santé maximale de l'unité 
     attack_power : int
         La puissance d'attaque de l'unité.
@@ -131,8 +131,6 @@ class Unit:
         pygame.draw.rect(screen, PURPLE, (self.x * CELL_SIZE,self.y * CELL_SIZE - 3, round(CELL_SIZE * self.health/self.health_max), 6 ))
         pygame.draw.line(screen, WHITE, (self.x * CELL_SIZE,self.y * CELL_SIZE -1), (round((self.health/self.health_max + self.x) * CELL_SIZE)-1,self.y * CELL_SIZE - 1), width=1)
         pygame.draw.rect(screen, BLACK, (self.x * CELL_SIZE,self.y * CELL_SIZE - 3, CELL_SIZE, 6 ),1)
-        
-        
         
 # Test Hadriel:
 class Canard(Unit):

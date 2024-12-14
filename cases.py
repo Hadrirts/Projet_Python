@@ -46,10 +46,13 @@ class Case(ABC):
         La définition de la case sur la grille
     color : tuple
         La couleur de la case
-    __degats : int
-        Les dégats infligés par la case
-    __healing : int
-        La guérison opérée par la case
+    degats : int
+        Les dégats infligés par la case Lave
+    healing : int
+        La guérison opérée par la case Guerison
+    Game : Game
+    image : str
+        Nom du fichier de l'image de la case
     next : Indique que l'unité finit son tour
 
     Méthodes
@@ -66,32 +69,25 @@ class Case(ABC):
         self.x = x
         self.y = y
         self.rect = pygame.Rect(CELL_SIZE*self.x,CELL_SIZE*self.y,CELL_SIZE,CELL_SIZE)
-        self.__Game = Game
+        self.Game = Game
            
     def draw(self, screen):
         #pygame.draw.rect(screen, self.color, self.rect)     # Case couleur unie
-        screen.blit(self.image,(CELL_SIZE*self.x,CELL_SIZE*self.y))            # Case Image
+        picture = pygame.image.load(self.image)
+        picture = pygame.transform.scale(picture, (CELL_SIZE, CELL_SIZE)) # redimensionner l'image
+        screen.blit(picture,(CELL_SIZE*self.x,CELL_SIZE*self.y))            # Case Image
     
     @abstractmethod
     def effect(self,unit):
         pass
-    
-    @property
-    def Game(self):
-        return self.__Game
             
 class Lave(Case): 
     
     def __init__(self,x,y,Game):
         super().__init__(x,y,Game)
         #self.color = RED
-        self.image = pygame.image.load("lave.png")
-        self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE)) # redimensionner l'image
-        self.__degats = 5
-        
-    @property
-    def degats(self):
-        return self.__degats
+        self.image = "lave.png"
+        self.degats = 5
     
     def effect(self,unit,cases):
         self.next = False # Rester sur l'unité
@@ -119,7 +115,7 @@ class Lave(Case):
                 if isinstance(case,Mur):
                     murs.append(case)
             unit.move(dx, dy, murs)   # Déplacement
-            unit.health -= self.__degats # Se brûle -> Perd 5 PV
+            unit.health -= self.degats # Se brûle -> Perd 5 PV
             self.Game.flip_display(moving=True)
             
             if  unit.health <= 0:                # Si l'unité a perdu tout ses PV
@@ -136,14 +132,8 @@ class Lave(Case):
 class Guerison(Case):
     def __init__(self,x,y,Game):
         super().__init__(x,y,Game)
-        #self.color = BEIGE
-        self.image = pygame.image.load("coeur.png")
-        self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE)) # redimensionner l'image
-        #self.__healing = 5
-        
-    @property
-    def healing(self):
-        return self.__healing
+        self.image = "coeur.png"
+        #self.healing = 5
     
     def effect(self,unit,cases):
         self.next = False  # Pas de guérison -> rester sur l'unité
@@ -157,7 +147,7 @@ class Guerison(Case):
             print(f"Healed, PV : {unit.health_max}")
             print("-----------------------------")
             
-            cases.remove(self)
+            cases.remove(self) # faire disparaître la case
             self.Game.flip_display()
 
         
@@ -165,8 +155,7 @@ class Guerison(Case):
 class Mur(Case):
     def __init__(self,x,y,Game):
         super().__init__(x,y,Game)
-        self.image = pygame.image.load("mur.png")
-        self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE)) # redimensionner l'image
+        self.image = "mur.png"
     
     def effect(self,unit,dx=0,dy=0): # *Décrire la methode plus haut*
         self.next = False

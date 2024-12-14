@@ -337,7 +337,7 @@ def main():
     # Créer une instance de l'interface
     interface = Interface()
 
-    # Lancer le menu principal
+    # Lancer le menu principal et stocker les unités à jouer
     game.player_units = interface.display_menu()
 
     # Boucle principale du jeu
