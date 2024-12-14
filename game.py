@@ -315,33 +315,39 @@ class Game:
 
 def main():
 
-    # Initialisation de Pygame
     pygame.init()
-    
     pygame.mixer.init()
 
-    # Jouer une musique de fond
+    #musique de l'interface
     pygame.mixer.music.load("son_interface.mp3")
     pygame.mixer.music.play(-1)
-    pygame.mixer.music.set_volume(0.5)  # Ajuster le volume
-
-    # Instanciation de la fenêtre
+    pygame.mixer.music.set_volume(0.5)
+    
+    # Initialisation du jeu
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Monster Haven")
 
-    # Instanciation du jeu
-    game = Game(screen)
+    # Étapes du jeu
+    countdown_screen = CountdownScreen()
+    main_menu = MainMenu()
+    unit_selection_screen = UnitSelectionScreen()
 
-    # Créer une instance de l'interface
-    interface = Interface()
+    # Afficher le compte à rebours
+    countdown_screen.countdown()
 
-    # Lancer le menu principal et stocker les unités à jouer
-    game.player_units = interface.display_menu()
+    # Afficher le menu principal
+    if main_menu.display_menu() == "start_game":
+        # Sélection des unités
+        selected_units = unit_selection_screen.choose_unit(num_units_to_select=3)
 
-    # Boucle principale du jeu
-    while True:
-        game.handle_player_turn()
-        game.handle_enemy_turn()
+        # Démarrer le jeu
+        game = Game(screen)
+        game.player_units = selected_units
+
+        while True:
+            game.handle_player_turn()
+            game.handle_enemy_turn()
+    
 
 if __name__ == "__main__":
     main()

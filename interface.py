@@ -1,142 +1,74 @@
 import pygame
 import sys
-from unit import Archer, Paladin, Guerrier, Mage, WIDTH, HEIGHT, WHITE, GREY, FPS #Canard, Fee, # Importer les unités et les constantes nécessaires
+from unit import Archer, Paladin, Guerrier, Mage, WIDTH, HEIGHT, WHITE, GREY, FPS
 import math
 
-class Interface:
+"""
+@author: Amira
+"""
+
+class InterfaceBase:
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
-        pygame.display.set_caption("Page d'accueil du jeu")
         self.clock = pygame.time.Clock()
-        self.background_image = pygame.image.load("monster_haven.jpg")
-        self.background_image = pygame.transform.scale(self.background_image, (WIDTH, HEIGHT))
         self.font = pygame.font.Font(None, 48)
 
+    def load_background(self, image_path):
+        """Charge et ajuste l'image d'arrière-plan."""
+        background = pygame.image.load(image_path)
+        return pygame.transform.scale(background, (WIDTH, HEIGHT))
+
+
+class CountdownScreen(InterfaceBase):
+    def __init__(self):
+        super().__init__()
+        self.background_image = self.load_background("monster_haven.jpg")
+
     def countdown(self):
-        """Affiche un compte à rebours sous forme de barre de chargement"""
+        """Affiche un compte à rebours sous forme de barre de chargement."""
         bar_width = 400
         bar_height = 30
         bar_x = (WIDTH - bar_width) // 2
-        #bar_y = (HEIGHT - bar_height) // 2
         bar_y = (HEIGHT * 2) // 3
 
-
-        #checkpoints = [0.3, 0.6, 0.8, 1.0]  # Étapes de progression
-        checkpoints = [0.0, 1.0]
-        current_checkpoint = 0  # Index de l'étape actuelle
-        percentage = 0  # Pourcentage initial
+        percentage = 0
 
         while percentage < 1.0:
             self.screen.blit(self.background_image, (0, 0))
-            
-            # Barre grise de fond
+
+            # Barre de chargement
             pygame.draw.rect(self.screen, GREY, (bar_x, bar_y, bar_width, bar_height))
-            # Barre blanche remplie selon le pourcentage
             pygame.draw.rect(self.screen, WHITE, (bar_x, bar_y, bar_width * percentage, bar_height))
-            
-            # Afficher le pourcentage en texte
+
+            # Affichage du pourcentage
             text_surface = self.font.render(f"{int(percentage * 100)}%", True, WHITE)
             text_rect = text_surface.get_rect(center=(WIDTH // 2, bar_y - 40))
             self.screen.blit(text_surface, text_rect)
 
             pygame.display.flip()
-            
-            if percentage < checkpoints[current_checkpoint]:
-                percentage += 0.0167 # was 0.01
-            else:
-                pygame.time.delay(500) #was 500 
-                current_checkpoint += 1
-
-            self.clock.tick(60) # was FPS 
-
-    def choose_unit(self, num_units_to_select=2):
-        """Permet au joueur de choisir l'unité"""
-        units = [
-            {"name": "Paladin", "class": Paladin, "description": "Unité agile.", "image": "paladin.png"},
-            {"name": "Archer", "class": Archer, "description": "Unité magique.", "image": "archer.png"},
-            {"name": "Guerrier", "class": Guerrier, "description": "Unité magique.", "image": "guerrier.png"},
-            {"name": "Mage", "class": Mage, "description": "Unité magique.", "image": "mage.png"},
-            # {"name": "Canard", "class": Canard, "description": "Unité agile.", "image": "canard.png"},
-            # {"name": "Fee", "class": Fee, "description": "Unité magique.", "image": "fee.png"},
-        ]
-        
-        #charger les images des unités 
-        for unit in units:
-            unit["icon"] = pygame.image.load(unit["image"])
-            unit["icon"] = pygame.transform.scale(unit["icon"], (250, 250))
+            percentage += 0.0167  # Vitesse du chargement
+            self.clock.tick(60)
 
 
-        selected_index = 0
-        selected_units = [] #stocker les unités choisies 
-        frame = 0 #compteur pour l'animationn  
-        ix = 0 # position x de l'unité
-        while len(selected_units) < num_units_to_select:
-            self.screen.blit(self.background_image, (0, 0))
-
-            # Afficher les unités disponibles
-            for i, unit in enumerate(units):
-                color = WHITE if i == selected_index else GREY
-                oscillation_offset = math.sin((frame + i * 10) / 20) * 5
-                text_surface = self.font.render(unit["name"], True, color)
-                text_rect = text_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 100 + i * 60 + oscillation_offset)) #was 60 # +100 ajouté 
-                self.screen.blit(text_surface, text_rect)
-                if i == selected_index :
-                    self.screen.blit(unit["icon"], (0,415)) # Affichage de l'iconde de l'unité
-
-            # Afficher la description de l'unité sélectionnée
-            #description = units[selected_index]["description"]
-            #description_surface = self.font.render(description, True, WHITE)
-            #description_rect = description_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 150)) #was -100
-            #self.screen.blit(description_surface, description_rect)
-
-            # Afficher les unités déjà sélectionnées
-            selected_text = f"Sélectionnées ({len(selected_units)}/{num_units_to_select}): " + ", ".join([unit["name"] for unit in selected_units])
-            selected_surface = self.font.render(selected_text, True, WHITE)
-            #selected_rect = selected_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 150))
-            selected_rect = selected_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 50 + oscillation_offset))
-            self.screen.blit(selected_surface, selected_rect)
-
-            pygame.display.flip()
-
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_UP:
-                        selected_index = (selected_index - 1) % len(units)
-                    elif event.key == pygame.K_DOWN:
-                        selected_index = (selected_index + 1) % len(units)
-                    elif event.key == pygame.K_RETURN:
-                        # Retourner l'unité choisie
-                        selected_unit_class = units[selected_index]["class"]
-                        selected_units.append({
-                        "name": units[selected_index]["name"],
-                        "unit": selected_unit_class(ix, 0, 20, 2, 10,"player")
-                    })
-                        ix += 1
-            frame += 1 #Incrémenter le compteur 
-            self.clock.tick(FPS)
-        return [u["unit"] for u in selected_units] # Retourner toutes les unités sélectionnées
+class MainMenu(InterfaceBase):
+    def __init__(self):
+        super().__init__()
+        self.background_image = self.load_background("monster_haven.jpg")
 
     def display_menu(self):
         """Affiche le menu principal."""
-        self.countdown()
-
         menu_items = ["Nouvelle partie", "Quitter"]
         selected_index = 0
-        frame = 0 # compteur pour l'animation  
+        frame = 0
 
         while True:
             self.screen.blit(self.background_image, (0, 0))
 
             for i, item in enumerate(menu_items):
                 color = WHITE if i == selected_index else GREY
-                #Ajou d'un décalage d'oscillation vertical 
                 oscillation_offset = math.sin((frame + i * 10) / 20) * 5
                 text_surface = self.font.render(item, True, color)
-                #text_rect = text_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2 + i * 60))
                 text_rect = text_surface.get_rect(center=(WIDTH // 2, HEIGHT * 2 // 3 + i * 60 + oscillation_offset))
                 self.screen.blit(text_surface, text_rect)
 
@@ -152,11 +84,80 @@ class Interface:
                     elif event.key == pygame.K_DOWN:
                         selected_index = (selected_index + 1) % len(menu_items)
                     elif event.key == pygame.K_RETURN:
-                        if selected_index == 0:  # "Nouvelle partie" 
-                            selected_units = self.choose_unit(num_units_to_select=3)  # Choix des unités
-                            return selected_units  # Retour des unités choisies
-                        elif selected_index == 1:  # "Quitter"
+                        if selected_index == 0:
+                            return "start_game"
+                        elif selected_index == 1:
                             pygame.quit()
                             sys.exit()
-            frame += 1 #Incrémenter le compteur pour l'animation 
+            frame += 1
+            self.clock.tick(FPS)
+
+
+class UnitSelectionScreen(InterfaceBase):
+    def __init__(self):
+        super().__init__()
+        self.background_image = self.load_background("monster_haven.jpg")
+
+    def choose_unit(self, num_units_to_select=3):
+        """Permet au joueur de choisir les unités."""
+        units = [
+            {"name": "Paladin", "class": Paladin, "image": "paladin.png"},
+            {"name": "Archer", "class": Archer, "image": "archer.png"},
+            {"name": "Guerrier", "class": Guerrier, "image": "guerrier.png"},
+            {"name": "Mage", "class": Mage, "image": "mage.png"}
+        ]
+
+        # Charger les icônes des unités
+        for unit in units:
+            unit["icon"] = pygame.image.load(unit["image"])
+            unit["icon"] = pygame.transform.scale(unit["icon"], (250, 250))
+
+        selected_index = 0
+        selected_units = []  # Liste des unités sélectionnées
+        frame = 0
+
+        while len(selected_units) < num_units_to_select:
+            self.screen.blit(self.background_image, (0, 0))
+
+            # Affichage des unités disponibles
+            for i, unit in enumerate(units):
+                color = WHITE if i == selected_index else GREY
+                oscillation_offset = math.sin((frame + i * 10) / 20) * 5
+                text_surface = self.font.render(unit["name"], True, color)
+                text_rect = text_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 100 + i * 60 + oscillation_offset))
+                self.screen.blit(text_surface, text_rect)
+
+                if i == selected_index:
+                    self.screen.blit(unit["icon"], (50, 415))  # Afficher l'icône
+
+            # Afficher les unités déjà sélectionnées
+            selected_text = f"Sélectionnées ({len(selected_units)}/{num_units_to_select}): " + ", ".join(
+                [unit.name for unit in selected_units]  # Utilisation de l'attribut `name` de l'objet
+            )
+            selected_surface = self.font.render(selected_text, True, WHITE)
+            selected_rect = selected_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 50))
+            self.screen.blit(selected_surface, selected_rect)
+
+            pygame.display.flip()
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_UP:
+                        selected_index = (selected_index - 1) % len(units)
+                    elif event.key == pygame.K_DOWN:
+                        selected_index = (selected_index + 1) % len(units)
+                    elif event.key == pygame.K_RETURN:
+                        # Ajouter l'unité sélectionnée
+                        selected_unit = units[selected_index]["class"](len(selected_units), 0, 20, 2, 10, "player")
+                        selected_unit.name = units[selected_index]["name"]  # Ajouter un attribut `name` à l'objet
+                        selected_units.append(selected_unit)
+                        # Réinitialiser l'index si nécessaire
+                        if len(selected_units) < num_units_to_select:
+                            selected_index = 0  # Réinitialiser l'index pour les unités restantes
+                        else:
+                            return selected_units
+            frame += 1
             self.clock.tick(FPS)
