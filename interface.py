@@ -96,7 +96,7 @@ class MainMenu(InterfaceBase):
 class UnitSelectionScreen(InterfaceBase):
     def __init__(self):
         super().__init__()
-        self.background_image = self.load_background("monster_haven.jpg")
+        self.background_image = self.load_background("monster1.jpg")
 
     def choose_unit(self, num_units_to_select=3):
         """Permet au joueur de choisir les unités."""
@@ -110,7 +110,7 @@ class UnitSelectionScreen(InterfaceBase):
         # Charger les icônes des unités
         for unit in units:
             unit["icon"] = pygame.image.load(unit["image"])
-            unit["icon"] = pygame.transform.scale(unit["icon"], (250, 250))
+            unit["icon"] = pygame.transform.scale(unit["icon"], (200, 200)) #was 250 
 
         selected_index = 0
         selected_units = []  # Liste des unités sélectionnées
