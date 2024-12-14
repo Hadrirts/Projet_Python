@@ -1,5 +1,5 @@
 import pygame
-import competences
+from competences import *
 
 # Constantes
 GRID_SIZE = 13   # Nombre de cases
@@ -120,9 +120,11 @@ class Unit:
 
     def draw(self, screen):
         """Affiche l'unité sur l'écran."""
+        
         if self.is_selected:
             pygame.draw.circle(screen, GREEN, (self.x * CELL_SIZE + CELL_SIZE //
                                 2, self.y * CELL_SIZE + CELL_SIZE // 2), CELL_SIZE // 3)
+            
         screen.blit(self.image,(self.x * CELL_SIZE,self.y * CELL_SIZE)) # afficher l'image
         
         # Barre de santé
@@ -130,50 +132,58 @@ class Unit:
         pygame.draw.line(screen, WHITE, (self.x * CELL_SIZE,self.y * CELL_SIZE -1), (round((self.health/self.health_max + self.x) * CELL_SIZE)-1,self.y * CELL_SIZE - 1), width=1)
         pygame.draw.rect(screen, BLACK, (self.x * CELL_SIZE,self.y * CELL_SIZE - 3, CELL_SIZE, 6 ),1)
         
-# # Test Hadriel:
-# class Canard(Unit):
-#     def __init__(self, x, y, health, attack_power, speed, team):
-#         super().__init__(x, y, health, attack_power, speed, team)
-#         picture = "canard.png" if self.team == 'player' else "evil_canard.png"
-#         self.image = pygame.image.load(picture)
-#         self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE)) # redimensionner l'image
-#         self.competences = competences.Spin()
-        
-# class Fee(Unit):
-#     def __init__(self, x, y, health, attack_power, speed, team):
-#         super().__init__(x, y, health, attack_power, speed, team)
-#         picture = "fee.png" if self.team == 'player' else "evil_fee.png"
-#         self.image = pygame.image.load(picture)
-#         self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE)) # redimensionner l'image
-#         self.competences = competences.Soin()
-        
+        # Affichage des compétences
+        for i,c in zip(range(len(self.competences)),self.competences):
+            taille = CELL_SIZE//3
+            pos_x = CELL_SIZE*self.x + i*taille
+            pos_y = CELL_SIZE*(self.y+1) 
+            if c.is_selected and self.is_selected :              
+                pygame.draw.circle(screen, GREEN, (pos_x + taille // 2, pos_y + taille // 2), CELL_SIZE // 6)
+            picture = pygame.transform.scale(c.image, (taille, taille)) # redimensionner l'image
+            screen.blit(picture,(pos_x,pos_y))   
+
 class Guerrier(Unit):
     def __init__(self, x, y, health, attack_power, speed, team):
         super().__init__(x, y, health, attack_power, speed, team)
-        picture = "guerrier.png" if self.team == 'player' else "guerrier.png"
+        picture = "guerrier.png"
         self.image = pygame.image.load(picture)
         self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE)) 
-        self.competences = competences.Spin()
+        self.competences = [Spin()]
+        
 class Archer(Unit):
     def __init__(self, x, y, health, attack_power, speed, team):
         super().__init__(x, y, health, attack_power, speed, team)
-        picture = "archer.png" if self.team == 'player' else "archer.png"
+        picture = "archer.png"
         self.image = pygame.image.load(picture)
         self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE)) 
-        self.competences = competences.Tir()
+        self.competences = [Tir()]
 
 class Mage(Unit):
     def __init__(self, x, y, health, attack_power, speed, team):
         super().__init__(x, y, health, attack_power, speed, team)
-        picture = "mage.png" if self.team == 'player' else "mage.png"
+        picture = "mage.png"
         self.image = pygame.image.load(picture)
         self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE)) 
-        self.competences = competences.BouleDeFeu()
+        self.competences = [BouleDeFeu()]
 
 class Paladin(Unit):
     def __init__(self, x, y, health, attack_power, speed, team):
         super().__init__(x, y, health, attack_power, speed, team)
-        picture = "paladin.png" if self.team == 'player' else "paladin.png"
+        picture = "paladin.png"
         self.image = pygame.image.load(picture)
         self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE)) # redimensionner l'image
-        self.competences = competences.Soin()
+        self.competences = [Soin()]
+
+class Monstre(Unit):
+    def __init__(self, x, y, health, attack_power, speed, monstre, team):
+        super().__init__(x, y, health, attack_power, speed, team)
+        if monstre == "monstre 1":
+            picture = "monstre1.png"
+        if monstre == "monstre 2":
+            picture = "monstre2.png"
+        if monstre == "monstre 3":
+            picture = "monstre3.png"
+        self.image = pygame.image.load(picture)
+        self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE)) # redimensionner l'image
+        self.competences = [Tir()]
+        

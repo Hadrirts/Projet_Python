@@ -1,21 +1,25 @@
 import math
-import unit
-# Constantes
-GRID_SIZE = 10   # Nombre de cases
-CELL_SIZE = 60   # Taille d'une case
+from unit import *
+
+GRID_SIZE = 13   # Nombre de cases
+CELL_SIZE = 55   # Taille d'une case
 WIDTH = GRID_SIZE * CELL_SIZE
 HEIGHT = GRID_SIZE * CELL_SIZE
+
 
 class Competence:
     def __init__(self, nom, degats, portee):
         self.nom = nom
         self.degats = degats
         self.portee = portee
+        self.is_selected = False
+        
 class BouleDeFeu(Competence):
     def __init__(self):
         super().__init__(nom="Boule de feu", degats=10, portee=3)
         self.zone_type = "cercle"
         self.rayon = 1
+        self.image = pygame.image.load("feu.png")
 
     def utiliser(self, caster, x, y, enemy_units):
         """Utilise la boule de feu, affectant une zone circulaire autour de la cible."""
@@ -35,10 +39,13 @@ class BouleDeFeu(Competence):
             if distance <= self.rayon:  # Vérifie si l'unité est dans la zone d'impact
                 affected_units.append(unit)
         return affected_units
+    
 class Tir(Competence):
     def __init__(self):
         super().__init__(nom="Tir", degats=10, portee=3)
         self.zone_type = "ligne"
+        self.image = pygame.image.load("arc.png")
+        
     def utiliser(self, caster, enemy_units, direction_active):
         """
         Utilise le tir en ligne, affectant une ligne droite dans la direction spécifiée.
@@ -79,10 +86,12 @@ class Tir(Competence):
                         affected_units.append(unit)
 
         return affected_units
+    
 class Soin(Competence):
     def __init__(self):
         super().__init__(nom="Soin", degats=-10, portee=1)
         self.zone_type = "zone"
+        self.image = pygame.image.load("soin.png")
 
     def get_allies_in_cercle(self, caster, player_units):
         """Retourne les unités dans une zone circulaire autour du caster."""
@@ -94,15 +103,17 @@ class Soin(Competence):
         return affected_units
     
     def utiliser(self, caster, player_units):
-        """Utilise le Spin pour infliger des dégâts dans un rayon autour du caster."""
+        """Utilise le Soin pour soigner dans un rayon autour du caster."""
         affected_units = self.get_allies_in_cercle(caster, player_units)
         for unit in affected_units:
             unit.health = min(unit.health - self.degats,unit.health_max)
         return f"utilise {self.nom} et touche {len(affected_units)} unités dans la zone."
+    
 class Spin(Competence):
     def __init__(self):
         super().__init__(nom="Spin", degats=20, portee=2)
         self.zone_type = "zone"
+        self.image = pygame.image.load("epee.png")
 
     def utiliser(self, caster, enemy_units):
         """Utilise le Spin pour infliger des dégâts dans un rayon autour du caster."""

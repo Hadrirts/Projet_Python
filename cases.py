@@ -2,9 +2,7 @@ import pygame
 import random 
 from abc import ABC, abstractmethod
 from unit import *
-"""
-@author: Hadriel
-"""
+from competences import *
 
 # Générer des cases aléatoirement
 def rand_coord(grid_size,nb_cases,coord_list):
@@ -81,9 +79,7 @@ class Case(ABC):
         self.Game = Game
            
     def draw(self, screen):
-        picture = pygame.image.load(self.image)
-        picture = pygame.transform.scale(picture, (CELL_SIZE, CELL_SIZE)) # redimensionner l'image
-        screen.blit(picture,(CELL_SIZE*self.x,CELL_SIZE*self.y))            # Case Image
+        screen.blit(self.image,(CELL_SIZE*self.x,CELL_SIZE*self.y))            # Case Image
     
     @abstractmethod
     def effect(self,unit):
@@ -93,7 +89,8 @@ class Lave(Case):
     
     def __init__(self,x,y,Game):
         super().__init__(x,y,Game)
-        self.image = "lave.png"
+        self.image = pygame.image.load('lave.png')
+        self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE))
         self.degats = 5
     
     def effect(self,unit,cases):
@@ -138,11 +135,12 @@ class Lave(Case):
 class Guerison(Case):
     def __init__(self,x,y,Game):
         super().__init__(x,y,Game)
-        self.image = "coeur.png"
+        self.image = pygame.image.load('coeur.png')
+        self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE))
         #self.healing = 5
     
     def effect(self,unit,cases):
-        self.next = False  # Pas de guérison -> rester sur l'unité
+        self.next = False  # Ne pas passer à l'unité suivante
         if self.rect.collidepoint(unit.x * CELL_SIZE, unit.y * CELL_SIZE):  # Si Unit est dans une zone de guérison
 
             # if unit.health + self.__healing > unit.health_max :
@@ -159,12 +157,47 @@ class Guerison(Case):
 class Mur(Case):
     def __init__(self,x,y,Game):
         super().__init__(x,y,Game)
-        self.image = "mur.png"
+        self.image = pygame.image.load('mur.png')
+        self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE))
     
-    def effect(self,unit,dx=0,dy=0): # *Décrire la methode plus haut*
+    def effect(self,unit,dx=0,dy=0):
         self.next = False
         if self.rect.collidepoint((unit.x + dx) * CELL_SIZE, (unit.y + dy) * CELL_SIZE):  # Si Unit est dans un mur
             return True
+
+# Objets pouvant être ramassés par l'unité
+
+class Objet(Case):
+    def effect(self,unit,cases):
+        self.next = False  # Ne pas passer à l'unité suivante
+        if self.rect.collidepoint(unit.x * CELL_SIZE, unit.y * CELL_SIZE): # Si l'unité est dans la case de l'objet
+            unit.competences.append(self.competence) # Ajouter la compétence de l'objet à l'unité
+            cases.remove(self) # Retirer l'objet
+            
+class Feu(Objet):
+    def __init__(self,x,y,Game):
+        super().__init__(x,y,Game)
+        self.competence = BouleDeFeu()
+        self.image = pygame.transform.scale(self.competence.image, (CELL_SIZE, CELL_SIZE))
+
+class Med(Objet):
+    def __init__(self,x,y,Game):
+        super().__init__(x,y,Game)
+        self.competence = Soin()
+        self.image = pygame.transform.scale(self.competence.image, (CELL_SIZE, CELL_SIZE))
+        
+class Epee(Objet):
+    def __init__(self,x,y,Game):
+        super().__init__(x,y,Game)
+        self.competence = Spin()
+        self.image = pygame.transform.scale(self.competence.image, (CELL_SIZE, CELL_SIZE))
+        
+class Arc(Objet):
+    def __init__(self,x,y,Game):
+        super().__init__(x,y,Game)
+        self.competence = Tir()
+        self.image = pygame.transform.scale(self.competence.image, (CELL_SIZE, CELL_SIZE))
+
 
             
 

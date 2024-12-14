@@ -4,6 +4,7 @@ import numpy as np
 from unit import *
 from cases import *
 from interface import *
+from competences import *
 
 class Game:
     """
@@ -32,8 +33,9 @@ class Game:
         self.screen = screen
         self.player_units = [] # à choisir dans l'interface
 
-        self.enemy_units = [Paladin(GRID_SIZE-1, GRID_SIZE-1, 8, 1, 5, 'enemy'),
-                            Archer(GRID_SIZE-2, GRID_SIZE-1, 8, 1, 5, 'enemy')]
+        self.enemy_units = [Monstre(GRID_SIZE-1, GRID_SIZE-1, 8, 1, 5,'monstre 1', 'enemy'),
+                            Monstre(GRID_SIZE-2, GRID_SIZE-1, 8, 1, 5,'monstre 2', 'enemy'),
+                            Monstre(GRID_SIZE-3, GRID_SIZE-1, 8, 1, 5,'monstre 3', 'enemy')]
         
         # Coordonnées des cases spéciales
 
@@ -42,16 +44,20 @@ class Game:
         mur_coord = [[2,2],[2,3],[3,2],[9,2],[10,2],[10,3],[2,9],[2,10],[3,10],[10,9],[10,10],[9,10],
                      [5,4],[6,4],[7,4],[5,8],[6,8],[7,8],
                      [0,6],[12,6],[6,1],[6,11]]   
+        objet_coord = [[11,1],[1,11],[6,3],[6,9]]
         # Générer des cases de lave aléatoirement
-        list_coord = mur_coord+guerison_coord+[[i.x,i.y] for i in self.player_units+self.enemy_units] # Liste des cases déjà prises
+        list_coord = mur_coord+guerison_coord+objet_coord+[[i.x,i.y] for i in self.player_units+self.enemy_units] # Liste des cases déjà prises
         lave_coord = rand_coord(GRID_SIZE,10,list_coord)
         
         # On définit les cases
         lave = [Lave(i,j,self) for i,j, in lave_coord]
         guerison = [Guerison(i,j,self) for i,j in guerison_coord]
         self.mur = [Mur(i,j,self) for i,j in mur_coord]
+        objets = [Feu(11,1,self),Arc(1,11,self),Med(6,3,self),Epee(6,9,self)]
         
-        self.cases = lave+self.mur+guerison
+        # objet_coord = 
+        
+        self.cases = lave+self.mur+guerison+objets
 
         self.aim_surface = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
        
@@ -201,7 +207,7 @@ class Game:
                         
                         self.flip_display(moving=True) # Met à jour l'écran de jeu
                         
-                        
+                        # Gestion des effets des cases spéciales
                         for case in self.cases:
                             if case.rect.collidepoint(selected_unit.x * CELL_SIZE, selected_unit.y * CELL_SIZE):  # Si l'unité est dans une case spéciale
                                 case.effect(selected_unit,self.cases) # Applique les effets de la case
@@ -210,10 +216,32 @@ class Game:
                                 selected_unit.is_selected = not(case.next)
                                 break
                                                         
-                        # Attaque (touche espace) met fin au tour
+                        # Gère la séléction de la compétence à utliser
+                        if (event.key in (pygame.K_1, pygame.K_KP1)) or (len(selected_unit.competences) == 1):
+                            competence = selected_unit.competences[0]
+                            sel = 0
+                        elif (event.key in (pygame.K_2, pygame.K_KP2)) and (len(selected_unit.competences) >= 2):
+                            competence = selected_unit.competences[1]
+                            sel = 1
+                        elif (event.key in (pygame.K_3, pygame.K_KP3)) and (len(selected_unit.competences) >= 3):
+                            competence = selected_unit.competences[2]
+                            sel = 2
+                        elif (event.key in (pygame.K_4 , pygame.K_KP4)) and (len(selected_unit.competences) >= 4):
+                            competence = selected_unit.competences[3]
+                            sel = 3
+                        elif not(competence):
+                            competence = selected_unit.competences[0]
+                            sel = 0
+                            
+                        for comp in selected_unit.competences:
+                            comp.is_selected = False    
+                            
+                        selected_unit.competences[sel].is_selected = True
+                        self.flip_display(moving=True)
+                            
+                        # Attaque (touche espace) met fin au tour  
                         if event.key == pygame.K_SPACE:
-                            #utilisation de la compétence
-                            competence = selected_unit.competences
+                            #utilisation de la compétence      
                             self.use_skillshot(selected_unit, competence)
                             has_acted = True
                             selected_unit.is_selected = False

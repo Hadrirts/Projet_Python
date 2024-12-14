@@ -128,7 +128,7 @@ class UnitSelectionScreen(InterfaceBase):
                 self.screen.blit(text_surface, text_rect)
 
                 if i == selected_index:
-                    self.screen.blit(unit["icon"], (50, 415))  # Afficher l'icône
+                    self.screen.blit(unit["icon"], (0, 415))  # Afficher l'icône
 
             # Afficher les unités déjà sélectionnées
             selected_text = f"Sélectionnées ({len(selected_units)}/{num_units_to_select}): " + ", ".join(
