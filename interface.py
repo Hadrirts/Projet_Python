@@ -53,14 +53,14 @@ class Interface:
     def choose_unit(self, num_units_to_select=2):
         """Permet au joueur de choisir l'unité"""
         units = [
-            {"name": "Canard", "class": Canard, "description": "Unité agile."},
-            {"name": "Fée", "class": Fee, "description": "Unité magique."}
+            {"name": "Canard", "class": Canard, "description": "Unité agile.", "image": "canard.png"},
+            {"name": "Fée", "class": Fee, "description": "Unité magique.", "image": "fee.png"}
         ]
         
         #charger les images des unités 
-        #for unit in units:
-            #unit["icon"] = pygame.image.load(unit["image"])
-            #unit["icon"] = pygame.transform.scale(unit["icon"], (50, 50))
+        for unit in units:
+            unit["icon"] = pygame.image.load(unit["image"])
+            unit["icon"] = pygame.transform.scale(unit["icon"], (200, 200))
 
 
         selected_index = 0
@@ -77,12 +77,13 @@ class Interface:
                 text_surface = self.font.render(unit["name"], True, color)
                 text_rect = text_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 100 + i * 60 + oscillation_offset)) #was 60 # +100 ajouté 
                 self.screen.blit(text_surface, text_rect)
-                
-            
-            # Afficher l'image de l'unité
-            #icon_x = WIDTH // 2 - 100  # Décaler l'icône à gauche du texte
-            #icon_y = HEIGHT // 2 + 90 + i * 70 + oscillation_offset
-            #self.screen.blit(unit["icon"], (icon_x, icon_y))
+                if i == selected_index :
+                    self.screen.blit(unit["icon"], (50,450))
+                    
+            # # Afficher l'image de l'unité
+            # icon_x = WIDTH // 2 - 100  # Décaler l'icône à gauche du texte
+            # icon_y = HEIGHT // 2 + 90 + i * 70 + oscillation_offset
+            # self.screen.blit(unit["icon"], (icon_x, icon_y))
 
             # Afficher la description de l'unité sélectionnée
             #description = units[selected_index]["description"]

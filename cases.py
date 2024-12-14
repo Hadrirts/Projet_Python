@@ -9,6 +9,21 @@ from unit import *
 # Générer des cases aléatoirement
 def rand_coord(grid_size,nb_cases,coord_list):
     
+    """
+    Fonction qui oermet de générer des coordonnées de cases aléatoires non occupées
+    
+    -----
+    INPUT :
+        grid_size : int
+            Taille de la fenêtre de jeu (nombre de cases)
+        nb_cases : int
+            Nombre de coordonnées de cases à générer
+        coord_list : list[list[int][2]]
+            Liste des coordonnées des cases déjà occupées
+    OUTPUT:
+        coord : list[list[int][2]]
+            Liste des coordonnées de cases libres générées
+    """
     coord = []
     
     min_val = 0
@@ -27,11 +42,7 @@ def rand_coord(grid_size,nb_cases,coord_list):
     return coord
     
 class Case(ABC):
-    """
-    x,y : coordonées du coin supérieur gauche de la case, int ou liste
 
-    """
-    
     """
     Classe pour représenter une case spéciale.
 
@@ -44,15 +55,13 @@ class Case(ABC):
         La position y du coin supérieur gauche de la case.
     rect : pygame.Rect
         La définition de la case sur la grille
-    color : tuple
-        La couleur de la case
     degats : int
         Les dégats infligés par la case Lave
     healing : int
         La guérison opérée par la case Guerison
     Game : Game
     image : str
-        Nom du fichier de l'image de la case
+        Image de la case
     next : Indique que l'unité finit son tour
 
     Méthodes
@@ -72,7 +81,6 @@ class Case(ABC):
         self.Game = Game
            
     def draw(self, screen):
-        #pygame.draw.rect(screen, self.color, self.rect)     # Case couleur unie
         picture = pygame.image.load(self.image)
         picture = pygame.transform.scale(picture, (CELL_SIZE, CELL_SIZE)) # redimensionner l'image
         screen.blit(picture,(CELL_SIZE*self.x,CELL_SIZE*self.y))            # Case Image
@@ -85,7 +93,6 @@ class Lave(Case):
     
     def __init__(self,x,y,Game):
         super().__init__(x,y,Game)
-        #self.color = RED
         self.image = "lave.png"
         self.degats = 5
     
@@ -128,7 +135,6 @@ class Lave(Case):
                 
             self.Game.flip_display(moving=True)
                 
-
 class Guerison(Case):
     def __init__(self,x,y,Game):
         super().__init__(x,y,Game)
@@ -149,8 +155,6 @@ class Guerison(Case):
             
             cases.remove(self) # faire disparaître la case
             self.Game.flip_display()
-
-        
 
 class Mur(Case):
     def __init__(self,x,y,Game):

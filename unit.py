@@ -123,9 +123,7 @@ class Unit:
         if self.is_selected:
             pygame.draw.circle(screen, GREEN, (self.x * CELL_SIZE + CELL_SIZE //
                                 2, self.y * CELL_SIZE + CELL_SIZE // 2), CELL_SIZE // 3)
-        picture = pygame.image.load(self.image)
-        picture = pygame.transform.scale(picture, (CELL_SIZE, CELL_SIZE)) # redimensionner l'image
-        screen.blit(picture,(self.x * CELL_SIZE,self.y * CELL_SIZE)) # afficher l'image
+        screen.blit(self.image,(self.x * CELL_SIZE,self.y * CELL_SIZE)) # afficher l'image
         
         # Barre de santé
         pygame.draw.rect(screen, PURPLE, (self.x * CELL_SIZE,self.y * CELL_SIZE - 3, round(CELL_SIZE * self.health/self.health_max), 6 ))
@@ -136,13 +134,17 @@ class Unit:
 class Canard(Unit):
     def __init__(self, x, y, health, attack_power, speed, team):
         super().__init__(x, y, health, attack_power, speed, team)
-        self.image = "canard.png" if self.team == 'player' else "evil_canard.png"
+        picture = "canard.png" if self.team == 'player' else "evil_canard.png"
+        self.image = pygame.image.load(picture)
+        self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE)) # redimensionner l'image
         self.competences = competences.Spin()
         
 class Fee(Unit):
     def __init__(self, x, y, health, attack_power, speed, team):
         super().__init__(x, y, health, attack_power, speed, team)
-        self.image = "fee.png" if self.team == 'player' else "evil_fee.png"
+        picture = "fee.png" if self.team == 'player' else "evil_fee.png"
+        self.image = pygame.image.load(picture)
+        self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE)) # redimensionner l'image
         self.competences = competences.Soin()
         
 class guerrier(Unit):

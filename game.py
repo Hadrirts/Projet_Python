@@ -242,8 +242,6 @@ class Game:
                     self.player_units.remove(target)
                     print("Team unit died :/")  
 
-
-
     def flip_display(self, viser_mode=False, moving=False):
         """Affiche le jeu."""
 
