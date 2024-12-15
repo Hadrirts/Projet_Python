@@ -290,15 +290,19 @@ class Game:
                             
                         # Attaque (touche espace) met fin au tour  
                         if event.key == pygame.K_SPACE:
-                            #utilisation de la compétence      
-                            self.use_skillshot(selected_unit, competence)
-                            has_acted = True
-                            selected_unit.is_selected = False
+                            # Vérifier si la compétence est disponible
+                            if competence.is_available():
+                                # Utilisation de la compétence
+                                self.use_skillshot(selected_unit, competence)
+                                has_acted = True
+                                selected_unit.is_selected = False
                         # Fin du tour sans utiliser de compétence (touche return)
                         elif event.key == pygame.K_RETURN:
                             has_acted = True
                             selected_unit.is_selected = False
-
+            # Décrémenter les cooldowns des compétences de l'unité
+            for comp in selected_unit.competences:
+                comp.decrement_cooldown()
 
     def handle_enemy_turn(self):
         """IA améliorée pour les ennemis."""
@@ -308,13 +312,12 @@ class Game:
             # 1. Prioriser la cible (par exemple, cible la plus faible en points de vie)
             target = min(self.player_units, key=lambda unit: unit.health)
 
-            # 2. Calculer le chemin le plus court vers la cible (déplacement intelligent)
+            # 2. Calculer le chemin le plus court vers la cible
             start = (enemy.x, enemy.y)
             goal = (target.x, target.y)
             walls = {(mur.x, mur.y) for mur in self.mur}
             grid_size = GRID_SIZE
             path = astar(start, goal, grid_size, walls)
-            print(f"Chemin calculé pour {enemy}: {path}")
             enemy.calcule_zone_mov()
 
             if path:
@@ -377,7 +380,7 @@ class Game:
             font = pygame.font.Font(None, 15)
             text_surface = font.render("Séléctionner une compétence", True, WHITE)
             text_rect = text_surface.get_rect()
-            text_rect.bottomleft = img_rect.bottomright
+            text_rect.bottomleft = (prev_rect.topright[0] + 5, prev_rect.topright[1] + 25)
             self.screen.blit(text_surface, text_rect)
             
             barre_esp = pygame.image.load("barre_esp.png") 
@@ -392,6 +395,15 @@ class Game:
             text_rect = text_surface.get_rect()
             text_rect.bottomleft = barre_rect.bottomright
             self.screen.blit(text_surface, text_rect)
+            
+            # Afficher les cooldowns à droite
+            cooldown_x = WIDTH - 150
+            for i, comp in enumerate(unit.competences):
+                cooldown_text = f"{comp.nom}: disponible dans {comp.current_cooldown}tours" if comp.current_cooldown > 0 else f"{comp.nom}: Ready"
+                cooldown_surface = font.render(cooldown_text, True, WHITE)
+                cooldown_rect = cooldown_surface.get_rect()
+                cooldown_rect.topleft = (cooldown_x, HEIGHT + 5 + i * 20)
+                self.screen.blit(cooldown_surface, cooldown_rect)
             
         if viser_mode:
             fleches = pygame.image.load("fleches.png") 

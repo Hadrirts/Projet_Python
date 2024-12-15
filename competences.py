@@ -9,15 +9,27 @@ HEIGHT = GRID_SIZE * CELL_SIZE
 
 
 class Competence:
-    def __init__(self, nom, degats, portee):
+    def __init__(self, nom, degats, portee, cooldown):
         self.nom = nom
         self.degats = degats
         self.portee = portee
+        self.cooldown = cooldown
+        self.current_cooldown = 0
         self.is_selected = False
-        
+
+    def is_available(self):
+        return self.current_cooldown == 0
+
+    def start_cooldown(self):
+        self.current_cooldown = self.cooldown
+
+    def decrement_cooldown(self):
+        if self.current_cooldown > 0:
+            self.current_cooldown -= 1
+
 class BouleDeFeu(Competence):
     def __init__(self):
-        super().__init__(nom="Boule de feu", degats=10, portee=3)
+        super().__init__(nom="Boule de feu", degats=10, portee=3, cooldown=3)
         self.zone_type = "cercle"
         self.rayon = 1
         self.image = pygame.image.load("feu.png")
@@ -30,7 +42,7 @@ class BouleDeFeu(Competence):
                 unit.health -= (self.degats-unit.defense)
                 if unit.health <= 0:
                     enemy_units.remove(unit)
-            print(f"utilise {self.nom} et touche {len(affected_units)} unités dans la zone circulaire")
+            self.start_cooldown()
 
     def get_enemy_in_cercle(self, x, y, enemy_units):
         """Retourne les unités dans une zone circulaire autour de la cible."""
@@ -43,7 +55,7 @@ class BouleDeFeu(Competence):
     
 class Tir(Competence):
     def __init__(self):
-        super().__init__(nom="Tir", degats=10, portee=3)
+        super().__init__(nom="Tir", degats=10, portee=3, cooldown=3)
         self.zone_type = "ligne"
         self.image = pygame.image.load("arc.png")
         
@@ -56,6 +68,7 @@ class Tir(Competence):
             unit.health -= (self.degats - unit.defense)
             if unit.health <= 0:
                 enemy_units.remove(unit)
+        self.start_cooldown()
         return f"utilise {self.nom} et touche {len(affected_units)} unités dans la direction {direction_active}."
 
     def get_units_in_ligne(self, caster, enemy_units, direction_active):
@@ -90,7 +103,7 @@ class Tir(Competence):
     
 class Soin(Competence):
     def __init__(self):
-        super().__init__(nom="Soin", degats=-10, portee=1)
+        super().__init__(nom="Soin", degats=-10, portee=1, cooldown=2)
         self.zone_type = "zone"
         self.image = pygame.image.load("soin.png")
 
@@ -108,11 +121,12 @@ class Soin(Competence):
         affected_units = self.get_allies_in_cercle(caster, player_units)
         for unit in affected_units:
             unit.health = min(unit.health - self.degats, unit.health_max)
+        self.start_cooldown()
         return f"utilise {self.nom} et touche {len(affected_units)} unités dans la zone."
     
 class Spin(Competence):
     def __init__(self):
-        super().__init__(nom="Spin", degats=20, portee=3)
+        super().__init__(nom="Spin", degats=20, portee=3, cooldown=2)
         self.zone_type = "zone"
         self.image = pygame.image.load("epee.png")
 
@@ -123,6 +137,7 @@ class Spin(Competence):
             unit.health -= (self.degats - unit.defense)
             if unit.health <= 0:
                 enemy_units.remove(unit)
+        self.start_cooldown()
         return f"utilise {self.nom} et touche {len(affected_units)} unités dans la zone circulaire."
     
     def get_enemy_in_cercle(self, caster, enemy_units):
