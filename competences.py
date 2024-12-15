@@ -1,6 +1,7 @@
 import math
 from unit import *
 import pygame
+from abc import ABC, abstractmethod
 
 GRID_SIZE = 13   # Nombre de cases
 CELL_SIZE = 55   # Taille d'une case
@@ -8,7 +9,7 @@ WIDTH = GRID_SIZE * CELL_SIZE
 HEIGHT = GRID_SIZE * CELL_SIZE
 
 
-class Competence:
+class Competence(ABC):
     def __init__(self, nom, degats, portee, cooldown):
         self.nom = nom
         self.degats = degats
@@ -16,6 +17,10 @@ class Competence:
         self.cooldown = cooldown
         self.current_cooldown = 0
         self.is_selected = False
+        
+    @abstractmethod
+    def utiliser(self,caster):
+        pass
 
     def is_available(self):
         return self.current_cooldown == 0
@@ -53,6 +58,33 @@ class BouleDeFeu(Competence):
             if distance <= self.rayon:  # Vérifie si l'unité est dans la zone d'impact
                 affected_units.append(unit)
         return affected_units
+    
+class Poing(Competence):
+    def __init__(self):
+        super().__init__(nom="Coup de Poing", degats=7, portee=1, cooldown=0)
+        self.zone_type = "zone"
+        self.image = pygame.image.load("poing.png")
+        self.description = "Frappe les ennemis à proximité"
+
+    def utiliser(self, caster, enemy_units):
+        """Utilise le Coup de Poing pour infliger des dégâts dans un rayon autour du caster."""
+        affected_units = self.get_enemy_in_cercle(caster, enemy_units)
+        for unit in affected_units:
+            unit.health -= (self.degats - unit.defense)
+            if unit.health <= 0:
+                enemy_units.remove(unit)
+        self.start_cooldown()
+        return f"utilise {self.nom} et touche {len(affected_units)} unités dans la zone circulaire."
+    
+    def get_enemy_in_cercle(self, caster, enemy_units):
+        """Retourne les unités dans une zone circulaire autour de la cible."""
+        affected_units = []
+        for unit in enemy_units:
+            distance = math.sqrt((unit.x - caster.x)**2 + (unit.y - caster.y)**2)
+            if distance <= self.portee:  # Vérifie si l'unité est dans la zone d'impact
+                affected_units.append(unit)
+        return affected_units
+    
     
 class Tir(Competence):
     def __init__(self):
@@ -132,7 +164,7 @@ class Spin(Competence):
         super().__init__(nom="Spin", degats=20, portee=3, cooldown=2)
         self.zone_type = "zone"
         self.image = pygame.image.load("epee.png")
-        self.description = "Attaque les ennemis à proximité"
+        self.description = "Attaque les ennemis autour"
 
     def utiliser(self, caster, enemy_units):
         """Utilise le Spin pour infliger des dégâts dans un rayon autour du caster."""

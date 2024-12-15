@@ -90,7 +90,7 @@ class Game:
         mur_coord = [[2,2],[2,3],[3,2],[9,2],[10,2],[10,3],[2,9],[2,10],[3,10],[10,9],[10,10],[9,10],
                      [5,4],[6,4],[7,4],[5,8],[6,8],[7,8],
                      [0,6],[12,6],[6,1],[6,11]]   
-        objet_coord = [[11,1],[1,11],[6,3],[6,9]]
+        objet_coord = [[11,1],[1,11],[6,3],[6,9],[1,6],[11,6]]
         # Générer des cases de lave aléatoirement
         list_coord = mur_coord+guerison_coord+objet_coord+[[i.x,i.y] for i in self.player_units+self.enemy_units] # Liste des cases déjà prises
         lave_coord = rand_coord(GRID_SIZE,10,list_coord)
@@ -99,7 +99,8 @@ class Game:
         lave = [Lave(i,j,self) for i,j, in lave_coord]
         guerison = [Guerison(i,j,self) for i,j in guerison_coord]
         self.mur = [Mur(i,j,self) for i,j in mur_coord]
-        objets = [Feu(11,1,self),Arc(1,11,self),Med(6,3,self),Epee(6,9,self)]    
+        rand_object = random.sample([Feu,Arc,Med,Epee],2)  # Faire apparaitre 2 objets aléatoires
+        objets = [Epee(11,6,self),Arc(1,6,self),Med(6,3,self),Feu(6,9,self)]+[rand_object[0](11,1,self),rand_object[1](1,11,self)]
         self.cases = lave+self.mur+guerison+objets
 
         self.aim_surface = pygame.Surface(screen.get_size(), pygame.SRCALPHA)

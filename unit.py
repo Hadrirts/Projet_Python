@@ -152,7 +152,7 @@ class Guerrier(Unit):
         picture = "guerrier.png"
         self.image = pygame.image.load(picture)
         self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE)) 
-        self.competences = [Spin()]
+        self.competences = [Poing(),Spin()]
         
 class Archer(Unit):
     def __init__(self, x=0, y=0, health=80, attack_power=15, defense=5, speed=6, team='player'):
@@ -160,7 +160,7 @@ class Archer(Unit):
         picture = "archer.png"
         self.image = pygame.image.load(picture)
         self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE)) 
-        self.competences = [Tir()]
+        self.competences = [Poing(),Tir()]
 
 class Mage(Unit):
     def __init__(self, x=0, y=0, health=60, attack_power=25, defense=3, speed=6, team='player'):
@@ -168,7 +168,7 @@ class Mage(Unit):
         picture = "mage.png"
         self.image = pygame.image.load(picture)
         self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE)) 
-        self.competences = [BouleDeFeu()]
+        self.competences = [Poing(),BouleDeFeu()]
 
 class Paladin(Unit):
     def __init__(self, x=0, y=0, health=120, attack_power=18, defense=15, speed=4, team='player'):
@@ -176,7 +176,7 @@ class Paladin(Unit):
         picture = "paladin.png"
         self.image = pygame.image.load(picture)
         self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE)) # redimensionner l'image
-        self.competences = [Soin()]
+        self.competences = [Poing(),Soin()]
 
 class Monstre(Unit):
     def __init__(self, x=0, y=0, health=150, attack_power=30, defense=8, speed=10, monstre="monstre 1", team='enemy'):
@@ -189,7 +189,7 @@ class Monstre(Unit):
             picture = "monstre3.png"
         self.image = pygame.image.load(picture)
         self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE)) # redimensionner l'image
-        self.competences = [Tir()]
+        self.competences = [Poing()]
         
 import heapq
 
