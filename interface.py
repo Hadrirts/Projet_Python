@@ -151,7 +151,7 @@ class UnitSelectionScreen(InterfaceBase):
                         selected_index = (selected_index + 1) % len(units)
                     elif event.key == pygame.K_RETURN:
                         # Ajouter l'unité sélectionnée
-                        selected_unit = units[selected_index]["class"](len(selected_units), 0, 20, 2, 10, "player")
+                        selected_unit = units[selected_index]["class"](len(selected_units))
                         selected_unit.name = units[selected_index]["name"]  # Ajouter un attribut `name` à l'objet
                         selected_units.append(selected_unit)
                         # Réinitialiser l'index si nécessaire

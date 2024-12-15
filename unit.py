@@ -1,5 +1,6 @@
 import pygame
 from competences import *
+import heapq
 
 # Constantes
 GRID_SIZE = 13   # Nombre de cases
@@ -51,7 +52,7 @@ class Unit:
         Dessine l'unité sur la grille.
     """
 
-    def __init__(self, x, y, health, attack_power, speed, team):
+    def __init__(self, x, y, health, attack_power, defense, speed, team):
         """
         Construit une unité avec une position, une santé, une puissance d'attaque et une équipe.
 
@@ -73,6 +74,7 @@ class Unit:
         self.health = health
         self.__health_max = health 
         self.attack_power = attack_power
+        self.defense = defense
         self.team = team  # 'player' ou 'enemy'
         self.is_selected = False
 
@@ -116,7 +118,7 @@ class Unit:
     def attack(self, target):
         """Attaque une unité cible."""
         if abs(self.x - target.x) <= 1 and abs(self.y - target.y) <= 1:
-            target.health -= self.attack_power
+            target.health -= (self.attack_power-target.defense)
 
     def draw(self, screen):
         """Affiche l'unité sur l'écran."""
@@ -143,40 +145,40 @@ class Unit:
             screen.blit(picture,(pos_x,pos_y))   
 
 class Guerrier(Unit):
-    def __init__(self, x, y, health, attack_power, speed, team):
-        super().__init__(x, y, health, attack_power, speed, team)
+    def __init__(self, x=0, y=0, health=100, attack_power=20, defense=10, speed=5, team='player'):
+        super().__init__(x, y, health, attack_power, defense, speed, team)
         picture = "guerrier.png"
         self.image = pygame.image.load(picture)
         self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE)) 
         self.competences = [Spin()]
         
 class Archer(Unit):
-    def __init__(self, x, y, health, attack_power, speed, team):
-        super().__init__(x, y, health, attack_power, speed, team)
+    def __init__(self, x=0, y=0, health=80, attack_power=15, defense=5, speed=6, team='player'):
+        super().__init__(x, y, health, attack_power, defense, speed, team)
         picture = "archer.png"
         self.image = pygame.image.load(picture)
         self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE)) 
         self.competences = [Tir()]
 
 class Mage(Unit):
-    def __init__(self, x, y, health, attack_power, speed, team):
-        super().__init__(x, y, health, attack_power, speed, team)
+    def __init__(self, x=0, y=0, health=60, attack_power=25, defense=3, speed=6, team='player'):
+        super().__init__(x, y, health, attack_power, defense, speed, team)
         picture = "mage.png"
         self.image = pygame.image.load(picture)
         self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE)) 
         self.competences = [BouleDeFeu()]
 
 class Paladin(Unit):
-    def __init__(self, x, y, health, attack_power, speed, team):
-        super().__init__(x, y, health, attack_power, speed, team)
+    def __init__(self, x=0, y=0, health=120, attack_power=18, defense=15, speed=4, team='player'):
+        super().__init__(x, y, health, attack_power, defense, speed, team)
         picture = "paladin.png"
         self.image = pygame.image.load(picture)
         self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE)) # redimensionner l'image
         self.competences = [Soin()]
 
 class Monstre(Unit):
-    def __init__(self, x, y, health, attack_power, speed, monstre, team):
-        super().__init__(x, y, health, attack_power, speed, team)
+    def __init__(self, x=0, y=0, health=150, attack_power=30, defense=8, speed=10, monstre="monstre 1", team='enemy'):
+        super().__init__(x, y, health, attack_power, defense, speed, team)
         if monstre == "monstre 1":
             picture = "monstre1.png"
         if monstre == "monstre 2":
@@ -186,4 +188,44 @@ class Monstre(Unit):
         self.image = pygame.image.load(picture)
         self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE)) # redimensionner l'image
         self.competences = [Tir()]
+import heapq
+
+def astar(start, goal, grid, walls):
+    def heuristic(a, b):
+        # Heuristique de Manhattan pour estimer la distance entre deux points
+        return abs(a[0] - b[0]) + abs(a[1] - b[1])
+
+    open_set = []
+    # Ajouter le point de départ à la file de priorité avec un coût initial de 0
+    heapq.heappush(open_set, (0, start))
+    came_from = {}
+    g_score = {start: 0}
+    f_score = {start: heuristic(start, goal)}
+
+    while open_set:
+        # Extraire le nœud avec le coût estimé le plus bas
+        _, current = heapq.heappop(open_set)
+
+        if current == goal:
+            # Si nous avons atteint le but, reconstruire le chemin
+            path = []
+            while current in came_from:
+                path.append(current)
+                current = came_from[current]
+            path.reverse()
+            return path
+
+        for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+            neighbor = (current[0] + dx, current[1] + dy)
+            tentative_g_score = g_score[current] + 1
+
+            if 0 <= neighbor[0] < len(grid) and 0 <= neighbor[1] < len(grid[0]) and neighbor not in walls:
+                if tentative_g_score < g_score.get(neighbor, float('inf')):
+                    came_from[neighbor] = current
+                    g_score[neighbor] = tentative_g_score
+                    f_score[neighbor] = tentative_g_score + heuristic(neighbor, goal)
+                    # Ajouter le voisin à la file de priorité
+                    heapq.heappush(open_set, (f_score[neighbor], neighbor))
+
+    return []
         

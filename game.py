@@ -6,6 +6,50 @@ from cases import *
 from interface import *
 from competences import *
 
+
+
+
+import heapq
+
+def astar(start, goal, grid_size, walls):
+    def heuristic(a, b):
+        # Heuristique de Manhattan pour estimer la distance entre deux points
+        return abs(a[0] - b[0]) + abs(a[1] - b[1])
+
+    open_set = []
+    # Ajouter le point de départ à la file de priorité avec un coût initial de 0
+    heapq.heappush(open_set, (0, start))
+    came_from = {}
+    g_score = {start: 0}
+    f_score = {start: heuristic(start, goal)}
+
+    while open_set:
+        # Extraire le nœud avec le coût estimé le plus bas
+        _, current = heapq.heappop(open_set)
+
+        if current == goal:
+            # Si nous avons atteint le but, reconstruire le chemin
+            path = []
+            while current in came_from:
+                path.append(current)
+                current = came_from[current]
+            path.reverse()
+            return path
+
+        for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+            neighbor = (current[0] + dx, current[1] + dy)
+            tentative_g_score = g_score[current] + 1
+
+            if 0 <= neighbor[0] < grid_size and 0 <= neighbor[1] < grid_size and neighbor not in walls:
+                if tentative_g_score < g_score.get(neighbor, float('inf')):
+                    came_from[neighbor] = current
+                    g_score[neighbor] = tentative_g_score
+                    f_score[neighbor] = tentative_g_score + heuristic(neighbor, goal)
+                    # Ajouter le voisin à la file de priorité
+                    heapq.heappush(open_set, (f_score[neighbor], neighbor))
+
+    return []
+
 class Game:
     """
     Classe pour représenter le jeu.
@@ -33,9 +77,11 @@ class Game:
         self.screen = screen
         self.player_units = [] # à choisir dans l'interface
 
-        self.enemy_units = [Monstre(GRID_SIZE-1, GRID_SIZE-1, 8, 1, 5,'monstre 1', 'enemy'),
-                            Monstre(GRID_SIZE-2, GRID_SIZE-1, 8, 1, 5,'monstre 2', 'enemy'),
-                            Monstre(GRID_SIZE-3, GRID_SIZE-1, 8, 1, 5,'monstre 3', 'enemy')]
+        self.enemy_units = [
+            Monstre(GRID_SIZE-1, GRID_SIZE-1, health=30, attack_power=30, defense=8, speed=2, monstre="monstre 1", team='enemy'),
+            Monstre(GRID_SIZE-2, GRID_SIZE-1, health=30, attack_power=30, defense=8, speed=2, monstre="monstre 1", team='enemy'),
+            Monstre(GRID_SIZE-3, GRID_SIZE-1, health=30, attack_power=30, defense=8, speed=2, monstre="monstre 1", team='enemy')
+        ]
         
         # Coordonnées des cases spéciales et objets
 
@@ -251,30 +297,55 @@ class Game:
                             self.use_skillshot(selected_unit, competence)
                             has_acted = True
                             selected_unit.is_selected = False
+                        # Fin du tour sans utiliser de compétence (touche return)
+                        elif event.key == pygame.K_RETURN:
+                            has_acted = True
+                            selected_unit.is_selected = False
 
 
     def handle_enemy_turn(self):
-        """IA très simple pour les ennemis."""
+        """IA améliorée pour les ennemis."""
         for enemy in self.enemy_units:
+            if not self.player_units:
+                self.flip_display()
+            # 1. Prioriser la cible (par exemple, cible la plus faible en points de vie)
+            target = min(self.player_units, key=lambda unit: unit.health)
 
-            # Déplacement aléatoire
-            target = random.choice(self.player_units)
-            dx = 1 if enemy.x < target.x else -1 if enemy.x > target.x else 0
-            dy = 1 if enemy.y < target.y else -1 if enemy.y > target.y else 0
-            enemy.move(dx, dy,self.mur)
-            
-            # Effets des cases
-            for case in self.cases:
-                if case.rect.collidepoint(enemy.x * CELL_SIZE, enemy.y * CELL_SIZE):  # Si l'unité est dans une case spéciale
-                    case.effect(enemy,self.cases)   # Applique les effets de la case
-                    break
+            # 2. Calculer le chemin le plus court vers la cible (déplacement intelligent)
+            start = (enemy.x, enemy.y)
+            goal = (target.x, target.y)
+            walls = {(mur.x, mur.y) for mur in self.mur}
+            grid_size = GRID_SIZE
+            path = astar(start, goal, grid_size, walls)
+            print(f"Chemin calculé pour {enemy}: {path}")
+            enemy.calcule_zone_mov()
 
-            # Attaque si possible
+            if path:
+                # Trouver la case accessible la plus proche de l'objectif
+                for step in path:
+                    if step in enemy.cases_acces:
+                        dx = step[0] - enemy.x
+                        dy = step[1] - enemy.y
+                        enemy.move(dx, dy, self.mur)
+                        self.flip_display()
+                        pygame.time.wait(200)
+
+
+            # 4. Utiliser une compétence ou attaquer
             if abs(enemy.x - target.x) <= 1 and abs(enemy.y - target.y) <= 1:
-                enemy.attack(target)
+                # Si l'ennemi a une compétence, l'utiliser
+                if hasattr(enemy, 'competence'):
+                    enemy.competence.use(target)
+                    print(f"utilise {enemy.competence.nom}!")
+                else:
+                    # Sinon, attaque classique
+                    enemy.attack(target)
+                    print(f"attaque!")
+
+                # Supprime l'unité cible si elle est morte
                 if target.health <= 0:
                     self.player_units.remove(target)
-                    print("Team unit died :/")  
+                    print("a été éliminé !")
                     
     def afficher_instructions(self, unit, viser_mode=False, moving=False):
         fond = pygame.Rect(0,HEIGHT,WIDTH,50)
