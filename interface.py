@@ -10,7 +10,7 @@ import math
 class InterfaceBase:
     def __init__(self):
         pygame.init()
-        self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
+        self.screen = pygame.display.set_mode((WIDTH, HEIGHT+50))
         self.clock = pygame.time.Clock()
         self.font = pygame.font.Font(None, 48)
 
@@ -110,7 +110,7 @@ class UnitSelectionScreen(InterfaceBase):
         # Charger les icônes des unités
         for unit in units:
             unit["icon"] = pygame.image.load(unit["image"])
-            unit["icon"] = pygame.transform.scale(unit["icon"], (200, 200)) #was 250 
+            unit["icon"] = pygame.transform.scale(unit["icon"], (280, 280))
 
         selected_index = 0
         selected_units = []  # Liste des unités sélectionnées
@@ -128,7 +128,7 @@ class UnitSelectionScreen(InterfaceBase):
                 self.screen.blit(text_surface, text_rect)
 
                 if i == selected_index:
-                    self.screen.blit(unit["icon"], (0, 415))  # Afficher l'icône
+                    self.screen.blit(unit["icon"], (0, HEIGHT-280))  # Afficher l'icône
 
             # Afficher les unités déjà sélectionnées
             selected_text = f"Sélectionnées ({len(selected_units)}/{num_units_to_select}): " + ", ".join(

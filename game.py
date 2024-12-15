@@ -37,7 +37,7 @@ class Game:
                             Monstre(GRID_SIZE-2, GRID_SIZE-1, 8, 1, 5,'monstre 2', 'enemy'),
                             Monstre(GRID_SIZE-3, GRID_SIZE-1, 8, 1, 5,'monstre 3', 'enemy')]
         
-        # Coordonnées des cases spéciales
+        # Coordonnées des cases spéciales et objets
 
         lave_coord = []
         guerison_coord = [[6,6],[3,3],[9,3],[3,9],[9,9]]
@@ -114,6 +114,7 @@ class Game:
                             viser = False
                         elif event.key == pygame.K_RETURN:  # Annuler
                             viser = False
+                self.afficher_instructions(unit,viser_mode=viser)
                         
 
     def afficher_zone_visee(self,unit, target_x, target_y, competence, direction_active = None):
@@ -158,6 +159,7 @@ class Game:
                             pygame.draw.rect(self.aim_surface, (255, 0, 0, 200), rect)  # Rouge pour la direction active
                         else:
                             pygame.draw.rect(self.aim_surface, (128, 128, 128, 100), rect)  # Jaune pour les autres    
+            
 
     def show_moveable_area(self, unit):
         """
@@ -180,6 +182,9 @@ class Game:
             selected_unit.calcule_zone_mov()
             self.show_moveable_area(selected_unit)
             self.flip_display(moving=True)  # Met à jour l'écran de jeu
+            competence = None
+            sel = 0 # Séléction de la compétence
+            self.afficher_instructions(selected_unit,moving=True)
             while not has_acted:
                 # Important: cette boucle permet de gérer les événements Pygame
                 for event in pygame.event.get():
@@ -238,6 +243,7 @@ class Game:
                             
                         selected_unit.competences[sel].is_selected = True
                         self.flip_display(moving=True)
+                        self.afficher_instructions(selected_unit,moving=True)
                             
                         # Attaque (touche espace) met fin au tour  
                         if event.key == pygame.K_SPACE:
@@ -269,12 +275,88 @@ class Game:
                 if target.health <= 0:
                     self.player_units.remove(target)
                     print("Team unit died :/")  
-
+                    
+    def afficher_instructions(self, unit, viser_mode=False, moving=False):
+        fond = pygame.Rect(0,HEIGHT,WIDTH,50)
+        pygame.draw.rect(self.screen,BLACK,fond)
+        # Affiche les instructions
+        if moving:
+            
+            fleches = pygame.image.load("fleches.png") 
+            fleches = pygame.transform.scale(fleches, (30, 20))
+            fleches_rect = fleches.get_rect()
+            fleches_rect.topleft = (0, HEIGHT)
+            self.screen.blit(fleches,fleches_rect) 
+                 
+            font = pygame.font.Font(None, 15)
+            text_surface = font.render("Se déplacer", True, WHITE)
+            text_rect = text_surface.get_rect()
+            text_rect.bottomleft = fleches_rect.bottomright
+            self.screen.blit(text_surface, text_rect)
+            
+            prev = pygame.image.load("un.png") 
+            prev = pygame.transform.scale(prev, (25, 25))
+            prev_rect = prev.get_rect()
+            prev_rect.bottomright = (0,HEIGHT+50)
+            for chiffre,i in zip(["un.png", "deux.png", "trois.png", "quatre.png", "cinq.png"],unit.competences):
+                img = pygame.image.load(chiffre) 
+                img = pygame.transform.scale(img, (25, 25))
+                img_rect = img.get_rect()
+                img_rect.topleft = prev_rect.topright
+                self.screen.blit(img, img_rect)
+                prev_rect = img_rect
+            
+            font = pygame.font.Font(None, 15)
+            text_surface = font.render("Séléctionner une compétence", True, WHITE)
+            text_rect = text_surface.get_rect()
+            text_rect.bottomleft = img_rect.bottomright
+            self.screen.blit(text_surface, text_rect)
+            
+            barre_esp = pygame.image.load("barre_esp.png") 
+            barre_esp = pygame.transform.scale(barre_esp, (30, 10))
+            barre_rect = barre_esp.get_rect()
+            barre_rect.left = 300
+            barre_rect.bottom = fleches_rect.bottom
+            self.screen.blit(barre_esp,barre_rect) 
+                 
+            font = pygame.font.Font(None, 15)
+            text_surface = font.render("Utiliser une compétence", True, WHITE)
+            text_rect = text_surface.get_rect()
+            text_rect.bottomleft = barre_rect.bottomright
+            self.screen.blit(text_surface, text_rect)
+            
+            
+            
+        if viser_mode:
+            fleches = pygame.image.load("fleches.png") 
+            fleches = pygame.transform.scale(fleches, (25, 16))
+            fleches_rect = fleches.get_rect()
+            fleches_rect.topleft = (0, HEIGHT)
+            self.screen.blit(fleches,fleches_rect) 
+                 
+            font = pygame.font.Font(None, 15)
+            text_surface = font.render("Viser", True, WHITE)
+            text_rect = text_surface.get_rect()
+            text_rect.bottomleft = fleches_rect.bottomright
+            self.screen.blit(text_surface, text_rect)
+            
+            barre_esp = pygame.image.load("barre_esp.png") 
+            barre_esp = pygame.transform.scale(barre_esp, (30, 10))
+            barre_rect = barre_esp.get_rect()
+            barre_rect.left = 300
+            barre_rect.bottom = fleches_rect.bottom
+            self.screen.blit(barre_esp,barre_rect) 
+                 
+            font = pygame.font.Font(None, 15)
+            text_surface = font.render("Confirmer", True, WHITE)
+            text_rect = text_surface.get_rect()
+            text_rect.bottomleft = barre_rect.bottomright
+            self.screen.blit(text_surface, text_rect)
+        
     def flip_display(self, viser_mode=False, moving=False):
         """Affiche le jeu."""
 
         # Affiche le background
-        
         background = pygame.image.load("sol.png") 
         background = pygame.transform.scale(background, (WIDTH, HEIGHT)) 
         self.screen.blit(background,(0,0)) 
@@ -286,14 +368,17 @@ class Game:
         for unit in self.player_units + self.enemy_units:
             unit.draw(self.screen)
 
+
         if(moving):
             self.screen.blit(self.aim_surface, (0, 0))
-
+            
+        # Affiche la surface de visée sur l'écran
         if(viser_mode):
-            # Affiche la surface de visée sur l'écran
             self.screen.blit(self.aim_surface, (0, 0))
+            
         # Rafraîchit l'écran
         pygame.display.flip()
+        
         if not(self.enemy_units) :
             print("All enemy units died!")
             self.display_end_message("You won!")
@@ -301,25 +386,6 @@ class Game:
         if not(self.player_units) :
             print("All team units died :(")
             self.display_end_message("Game Over")
-
-    def display_end_message(self, message):
-        """Affiche un message de fin, uniquement 'You won' ou 'Game Over'"""
-        #self.screen.fill(BLACK)  
-    
-        # Afficher le message au centre de l'écran
-        font = pygame.font.Font(None, 72)
-        text_surface = font.render(message, True, WHITE)
-        text_rect = text_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2))
-        self.screen.blit(text_surface, text_rect)
-    
-        pygame.display.flip()
-    
-        # Attendre un moment pour laisser le joueur lire le message
-        pygame.time.wait(3000)
-    
-        # Quitter le jeu après le message
-        pygame.quit()
-        sys.exit()
 
     def display_end_message(self, message):
         """Affiche un message de fin, uniquement 'You won' ou 'Game Over'"""

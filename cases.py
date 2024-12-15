@@ -58,7 +58,7 @@ class Case(ABC):
     healing : int
         La guérison opérée par la case Guerison
     Game : Game
-    image : str
+    image : pygame.surface.Surface
         Image de la case
     next : Indique que l'unité finit son tour
 
@@ -171,6 +171,9 @@ class Objet(Case):
     def effect(self,unit,cases):
         self.next = False  # Ne pas passer à l'unité suivante
         if self.rect.collidepoint(unit.x * CELL_SIZE, unit.y * CELL_SIZE): # Si l'unité est dans la case de l'objet
+            for u in unit.competences : # On vérifie que l'unité ne possède pas déjà la compétence
+                if type(self.competence) == type(u):
+                    return
             unit.competences.append(self.competence) # Ajouter la compétence de l'objet à l'unité
             cases.remove(self) # Retirer l'objet
             
