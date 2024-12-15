@@ -10,7 +10,7 @@ import math
 class InterfaceBase:
     def __init__(self):
         pygame.init()
-        self.screen = pygame.display.set_mode((WIDTH, HEIGHT+50))
+        self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         self.clock = pygame.time.Clock()
         self.font = pygame.font.Font(None, 48)
 
@@ -110,36 +110,40 @@ class UnitSelectionScreen(InterfaceBase):
         # Charger les icônes des unités
         for unit in units:
             unit["icon"] = pygame.image.load(unit["image"])
-            unit["icon"] = pygame.transform.scale(unit["icon"], (280, 280))
+            unit["icon"] = pygame.transform.scale(unit["icon"], (100, 100))  # Ajuster la taille des icônes
 
         selected_index = 0
         selected_units = []  # Liste des unités sélectionnées
         frame = 0
 
-        while len(selected_units) < num_units_to_select:
+        while True:
             self.screen.blit(self.background_image, (0, 0))
 
-            # Affichage des unités disponibles
+            # Afficher les icônes des unités sélectionnées
+            total_width = len(selected_units) * 120  # Largeur totale (100px pour l'icône + 20px d'espacement)
+            start_x = (WIDTH - total_width) // 2  # Calcul pour centrer horizontalement
+            for idx, unit in enumerate(selected_units):
+                oscillation_offset = math.sin(frame / 20) * 5  # Oscillation pour l'animation
+                x_position = start_x + idx * 120
+                y_position = HEIGHT // 4 + oscillation_offset
+                self.screen.blit(unit["icon"], (x_position, y_position))  # Placer les icônes des unités sélectionnées
+
+            # Affichage des unités disponibles (avec oscillations)
             for i, unit in enumerate(units):
                 color = WHITE if i == selected_index else GREY
-                oscillation_offset = math.sin((frame + i * 10) / 20) * 5
+                oscillation_offset = math.sin((frame + i * 10) / 20) * 5  # Oscillation
                 text_surface = self.font.render(unit["name"], True, color)
-                text_rect = text_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 100 + i * 60 + oscillation_offset))
+                text_rect = text_surface.get_rect(
+                    center=(WIDTH // 2, HEIGHT // 2 + 100 + i * 60 + oscillation_offset)
+                )
                 self.screen.blit(text_surface, text_rect)
 
                 if i == selected_index:
-                    self.screen.blit(unit["icon"], (0, HEIGHT-280))  # Afficher l'icône
-
-            # Afficher les unités déjà sélectionnées
-            selected_text = f"Sélectionnées ({len(selected_units)}/{num_units_to_select}): " + ", ".join(
-                [unit.name for unit in selected_units]  # Utilisation de l'attribut `name` de l'objet
-            )
-            selected_surface = self.font.render(selected_text, True, WHITE)
-            selected_rect = selected_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 50))
-            self.screen.blit(selected_surface, selected_rect)
+                    self.screen.blit(unit["icon"], (50, 400))  # Afficher l'icône
 
             pygame.display.flip()
 
+            # Gestion des événements
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -150,14 +154,21 @@ class UnitSelectionScreen(InterfaceBase):
                     elif event.key == pygame.K_DOWN:
                         selected_index = (selected_index + 1) % len(units)
                     elif event.key == pygame.K_RETURN:
-                        # Ajouter l'unité sélectionnée
-                        selected_unit = units[selected_index]["class"](len(selected_units))
-                        selected_unit.name = units[selected_index]["name"]  # Ajouter un attribut `name` à l'objet
-                        selected_units.append(selected_unit)
-                        # Réinitialiser l'index si nécessaire
                         if len(selected_units) < num_units_to_select:
-                            selected_index = 0  # Réinitialiser l'index pour les unités restantes
+                            # Ajouter l'unité sélectionnée
+                            selected_unit = {
+                                "icon": units[selected_index]["icon"],
+                                "name": units[selected_index]["name"],
+                                "class": units[selected_index]["class"]
+                            }
+                            selected_units.append(selected_unit)
+                            selected_index = 0  # Réinitialiser l'index si nécessaire
                         else:
-                            return selected_units
+                            # Commencer le jeu si toutes les unités sont sélectionnées
+                            return [
+                                unit["class"](0, 0, 20, 2, 10, "player") for unit in selected_units
+                            ]
             frame += 1
             self.clock.tick(FPS)
+
+
