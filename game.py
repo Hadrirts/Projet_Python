@@ -433,8 +433,9 @@ class Game:
         for unit in self.player_units:
             if unit.is_selected == True:
                 selected_unit = unit
+                self.afficher_instructions(selected_unit,viser_mode,moving)
                 break
-        self.afficher_instructions(selected_unit,viser_mode,moving)
+        
         for case in self.cases :
             case.draw(self.screen)       
         
