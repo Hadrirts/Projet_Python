@@ -347,25 +347,33 @@ class Game:
                     self.player_units.remove(target)
                     print("a été éliminé !")
                     
+    # Affiche les instructions :          
     def afficher_instructions(self, unit, viser_mode=False, moving=False):
-        fond = pygame.Rect(0,HEIGHT,WIDTH,50)
+        fond = pygame.Rect(0,HEIGHT,WIDTH,50)       # Fond noir
         pygame.draw.rect(self.screen,BLACK,fond)
-        # Affiche les instructions
+
+        barre_esp = pygame.image.load("barre_esp.png")  # Affichage de la barre espace
+        barre_esp = pygame.transform.scale(barre_esp, (30, 10))
+        barre_rect = barre_esp.get_rect()
+        barre_rect.left = 300
+        barre_rect.bottom = HEIGHT+40
+        self.screen.blit(barre_esp,barre_rect) 
+        
+        fleches = pygame.image.load("fleches.png")  # Affichage des flèches
+        fleches = pygame.transform.scale(fleches, (30, 20))
+        fleches_rect = fleches.get_rect()
+        fleches_rect.topleft = (0, HEIGHT)
+        
         if moving:
-            
-            fleches = pygame.image.load("fleches.png") 
-            fleches = pygame.transform.scale(fleches, (30, 20))
-            fleches_rect = fleches.get_rect()
-            fleches_rect.topleft = (0, HEIGHT)
             self.screen.blit(fleches,fleches_rect) 
-                 
-            font = pygame.font.Font(None, 15)
+            
+            font = pygame.font.Font(None, 15)   # Afficher "Se déplacer"
             text_surface = font.render("Se déplacer", True, WHITE)
             text_rect = text_surface.get_rect()
             text_rect.bottomleft = fleches_rect.bottomright
             self.screen.blit(text_surface, text_rect)
             
-            prev = pygame.image.load("un.png") 
+            prev = pygame.image.load("un.png")   # Afficher les numéros des compétences
             prev = pygame.transform.scale(prev, (25, 25))
             prev_rect = prev.get_rect()
             prev_rect.bottomright = (0,HEIGHT+50)
@@ -378,20 +386,13 @@ class Game:
                 prev_rect = img_rect
             
             font = pygame.font.Font(None, 15)
-            text_surface = font.render("Séléctionner une compétence", True, WHITE)
+            text_surface = font.render("Séléctionner une compétence", True, WHITE)  # Afficher "Séléctionner une compétence"
             text_rect = text_surface.get_rect()
             text_rect.bottomleft = (prev_rect.topright[0] + 5, prev_rect.topright[1] + 25)
             self.screen.blit(text_surface, text_rect)
-            
-            barre_esp = pygame.image.load("barre_esp.png") 
-            barre_esp = pygame.transform.scale(barre_esp, (30, 10))
-            barre_rect = barre_esp.get_rect()
-            barre_rect.left = 300
-            barre_rect.bottom = fleches_rect.bottom
-            self.screen.blit(barre_esp,barre_rect) 
                  
             font = pygame.font.Font(None, 15)
-            text_surface = font.render("Utiliser une compétence", True, WHITE)
+            text_surface = font.render("Utiliser une compétence", True, WHITE)    # Afficher "Utiliser une compétence"
             text_rect = text_surface.get_rect()
             text_rect.bottomleft = barre_rect.bottomright
             self.screen.blit(text_surface, text_rect)
@@ -406,45 +407,64 @@ class Game:
                 self.screen.blit(cooldown_surface, cooldown_rect)
             
         if viser_mode:
-            fleches = pygame.image.load("fleches.png") 
-            fleches = pygame.transform.scale(fleches, (25, 16))
-            fleches_rect = fleches.get_rect()
-            fleches_rect.topleft = (0, HEIGHT)
-            self.screen.blit(fleches,fleches_rect) 
+            for c in unit.competences :
+                if (c.is_selected == True) and (type(c) in [BouleDeFeu,Tir]):
+                    self.screen.blit(fleches,fleches_rect) 
+                         
+                    font = pygame.font.Font(None, 15)
+                    text_surface = font.render("Viser", True, WHITE)     # Afficher "Viser"
+                    text_rect = text_surface.get_rect()
+                    text_rect.bottomleft = fleches_rect.bottomright
+                    self.screen.blit(text_surface, text_rect)
+                    break
                  
             font = pygame.font.Font(None, 15)
-            text_surface = font.render("Viser", True, WHITE)
-            text_rect = text_surface.get_rect()
-            text_rect.bottomleft = fleches_rect.bottomright
-            self.screen.blit(text_surface, text_rect)
-            
-            barre_esp = pygame.image.load("barre_esp.png") 
-            barre_esp = pygame.transform.scale(barre_esp, (30, 10))
-            barre_rect = barre_esp.get_rect()
-            barre_rect.left = 300
-            barre_rect.bottom = fleches_rect.bottom
-            self.screen.blit(barre_esp,barre_rect) 
-                 
-            font = pygame.font.Font(None, 15)
-            text_surface = font.render("Confirmer", True, WHITE)
+            text_surface = font.render("Confirmer", True, WHITE)     # Afficher "Confirmer"
             text_rect = text_surface.get_rect()
             text_rect.bottomleft = barre_rect.bottomright
             self.screen.blit(text_surface, text_rect)
             
-        enter = pygame.image.load("enter.png")
+        enter = pygame.image.load("enter.png")                  # Afficher la touche "entrer"
         enter = pygame.transform.scale(enter, (20, 20))
         enter_rect = enter.get_rect()
         enter_rect.left = barre_rect.left
-        enter_rect.bottom = HEIGHT+50
+        enter_rect.top = HEIGHT
         self.screen.blit(enter,enter_rect) 
         
         font = pygame.font.Font(None, 15)
-        text_surface = font.render("Finir son tour", True, WHITE)
+        text_surface = font.render("Finir le tour", True, WHITE)  # Afficher la touche "Finir le tour"
         text_rect = text_surface.get_rect()
         text_rect.bottomleft = enter_rect.bottomright
         self.screen.blit(text_surface, text_rect)
         
+        # Afficher la compétence séléctionnée
         
+        font = pygame.font.Font(None, 20)
+        txt_surface = font.render("Compétence sélectionnée :", True, WHITE)  # Afficher la touche "Finir le tour"
+        txt_rect = txt_surface.get_rect()
+        txt_rect.left = enter_rect.right + 200
+        txt_rect.top = HEIGHT + 10
+        self.screen.blit(txt_surface, txt_rect)
+        
+        for c in unit.competences:
+            if c.is_selected == True:
+                
+                font = pygame.font.Font(None, 15)
+                text_surface = font.render(c.nom + ": " + "c.description", True, WHITE)  # Afficher la compétence sélectionnée et sa description
+                text_rect = text_surface.get_rect()
+                text_rect.top = txt_rect.bottom+5
+                text_rect.centerx = txt_rect.centerx
+                self.screen.blit(text_surface, text_rect)
+                
+                comp = c.image
+                comp = pygame.transform.scale(comp, (25, 25))
+                comp_rect = comp.get_rect()
+                comp_rect.centery = text_rect.centery
+                comp_rect.right = text_rect.left
+                self.screen.blit(comp,comp_rect)
+                
+                break
+
     def flip_display(self, viser_mode=False, moving=False):
         """Affiche le jeu."""
 
@@ -516,7 +536,7 @@ def main():
     pygame.mixer.music.set_volume(0.5)
     
     # Initialisation du jeu
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    screen = pygame.display.set_mode((WIDTH, HEIGHT+50))
     pygame.display.set_caption("Monster Haven")
 
     # Étapes du jeu

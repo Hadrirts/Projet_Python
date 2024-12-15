@@ -10,7 +10,7 @@ import math
 class InterfaceBase:
     def __init__(self):
         pygame.init()
-        self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
+        self.screen = pygame.display.set_mode((WIDTH, HEIGHT+50))
         self.clock = pygame.time.Clock()
         self.font = pygame.font.Font(None, 48)
 
@@ -110,7 +110,7 @@ class UnitSelectionScreen(InterfaceBase):
         # Charger les icônes des unités
         for unit in units:
             unit["icon"] = pygame.image.load(unit["image"])
-            unit["icon"] = pygame.transform.scale(unit["icon"], (100, 100))  # Ajuster la taille des icônes
+            unit["icon"] = pygame.transform.scale(unit["icon"], (280, 280))  # Ajuster la taille des icônes
 
         selected_index = 0
         selected_units = []  # Liste des unités sélectionnées
@@ -126,7 +126,8 @@ class UnitSelectionScreen(InterfaceBase):
                 oscillation_offset = math.sin(frame / 20) * 5  # Oscillation pour l'animation
                 x_position = start_x + idx * 120
                 y_position = HEIGHT // 4 + oscillation_offset
-                self.screen.blit(unit["icon"], (x_position, y_position))  # Placer les icônes des unités sélectionnées
+                icon = pygame.transform.scale(unit["icon"], (100, 100))  # Ajuster la taille des icônes
+                self.screen.blit(icon, (x_position, y_position))  # Placer les icônes des unités sélectionnées
 
             # Affichage des unités disponibles (avec oscillations)
             for i, unit in enumerate(units):
@@ -137,9 +138,8 @@ class UnitSelectionScreen(InterfaceBase):
                     center=(WIDTH // 2, HEIGHT // 2 + 100 + i * 60 + oscillation_offset)
                 )
                 self.screen.blit(text_surface, text_rect)
-
                 if i == selected_index:
-                    self.screen.blit(unit["icon"], (50, 400))  # Afficher l'icône
+                    self.screen.blit(unit["icon"], (0, HEIGHT-280))  # Afficher l'icône
 
             pygame.display.flip()
 
@@ -166,7 +166,7 @@ class UnitSelectionScreen(InterfaceBase):
                         else:
                             # Commencer le jeu si toutes les unités sont sélectionnées
                             return [
-                                unit["class"]() for unit in selected_units
+                                unit["class"](ix) for unit,ix in zip(selected_units,range(len(selected_unit)))
                             ]
             frame += 1
             self.clock.tick(FPS)
