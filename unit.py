@@ -17,6 +17,7 @@ GREEN = (0, 255, 0)
 
 BEIGE = (240,210,180)
 GREY = (200,200,200)
+D_GREY = (130,130,130)
 
 
 
@@ -139,8 +140,9 @@ class Unit:
             taille = CELL_SIZE//3
             pos_x = CELL_SIZE*self.x + i*taille
             pos_y = CELL_SIZE*(self.y+1) 
-            if c.is_selected and self.is_selected :              
-                pygame.draw.circle(screen, GREEN, (pos_x + taille // 2, pos_y + taille // 2), CELL_SIZE // 6)
+            if c.is_selected and self.is_selected :  
+                color = D_GREY if c.current_cooldown > 0 else GREEN
+                pygame.draw.circle(screen, color, (pos_x + taille // 2, pos_y + taille // 2), CELL_SIZE // 6)
             picture = pygame.transform.scale(c.image, (taille, taille)) # redimensionner l'image
             screen.blit(picture,(pos_x,pos_y))   
 
