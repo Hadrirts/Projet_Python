@@ -398,13 +398,13 @@ class Game:
             self.screen.blit(text_surface, text_rect)
             
             # Afficher les cooldowns à droite
-            cooldown_x = WIDTH - 150
-            for i, comp in enumerate(unit.competences):
-                cooldown_text = f"{comp.nom}: disponible dans {comp.current_cooldown}tours" if comp.current_cooldown > 0 else f"{comp.nom}: Ready"
-                cooldown_surface = font.render(cooldown_text, True, WHITE)
-                cooldown_rect = cooldown_surface.get_rect()
-                cooldown_rect.topleft = (cooldown_x, HEIGHT + 5 + i * 20)
-                self.screen.blit(cooldown_surface, cooldown_rect)
+            # cooldown_x = WIDTH - 150
+            # for i, comp in enumerate(unit.competences):
+            #     cooldown_text = f"{comp.nom}: disponible dans {comp.current_cooldown}tours" if comp.current_cooldown > 0 else f"{comp.nom}: Ready"
+            #     cooldown_surface = font.render(cooldown_text, True, WHITE)
+            #     cooldown_rect = cooldown_surface.get_rect()
+            #     cooldown_rect.topleft = (cooldown_x, HEIGHT + 5 + i * 20)
+            #     self.screen.blit(cooldown_surface, cooldown_rect)
             
         if viser_mode:
             for c in unit.competences :
@@ -455,6 +455,13 @@ class Game:
                 text_rect.top = txt_rect.bottom+5
                 text_rect.centerx = txt_rect.centerx
                 self.screen.blit(text_surface, text_rect)
+            
+                cooldown_text = f"disponible dans {c.current_cooldown}tours" if c.current_cooldown > 0 else f"Ready"
+                cooldown_surface = font.render(cooldown_text, True, WHITE)
+                cooldown_rect = cooldown_surface.get_rect()
+                cooldown_rect.centerx = text_rect.centerx
+                cooldown_rect.top = text_rect.bottom
+                self.screen.blit(cooldown_surface, cooldown_rect)
                 
                 comp = c.image
                 comp = pygame.transform.scale(comp, (25, 25))
