@@ -393,8 +393,6 @@ class Game:
             text_rect.bottomleft = barre_rect.bottomright
             self.screen.blit(text_surface, text_rect)
             
-            
-            
         if viser_mode:
             fleches = pygame.image.load("fleches.png") 
             fleches = pygame.transform.scale(fleches, (25, 16))
@@ -420,6 +418,20 @@ class Game:
             text_rect = text_surface.get_rect()
             text_rect.bottomleft = barre_rect.bottomright
             self.screen.blit(text_surface, text_rect)
+            
+        enter = pygame.image.load("enter.png")
+        enter = pygame.transform.scale(enter, (20, 20))
+        enter_rect = enter.get_rect()
+        enter_rect.left = barre_rect.left
+        enter_rect.bottom = HEIGHT+50
+        self.screen.blit(enter,enter_rect) 
+        
+        font = pygame.font.Font(None, 15)
+        text_surface = font.render("Finir son tour", True, WHITE)
+        text_rect = text_surface.get_rect()
+        text_rect.bottomleft = enter_rect.bottomright
+        self.screen.blit(text_surface, text_rect)
+        
         
     def flip_display(self, viser_mode=False, moving=False):
         """Affiche le jeu."""
