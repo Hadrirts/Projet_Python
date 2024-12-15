@@ -166,7 +166,7 @@ class UnitSelectionScreen(InterfaceBase):
                         else:
                             # Commencer le jeu si toutes les unités sont sélectionnées
                             return [
-                                unit["class"](0, 0, 20, 2, 10, "player") for unit in selected_units
+                                unit["class"]() for unit in selected_units
                             ]
             frame += 1
             self.clock.tick(FPS)
