@@ -114,7 +114,6 @@ class Game:
                             viser = False
                         elif event.key == pygame.K_RETURN:  # Annuler
                             viser = False
-                self.afficher_instructions(unit,viser_mode=viser)
                         
 
     def afficher_zone_visee(self,unit, target_x, target_y, competence, direction_active = None):
@@ -184,7 +183,6 @@ class Game:
             self.flip_display(moving=True)  # Met à jour l'écran de jeu
             competence = None
             sel = 0 # Séléction de la compétence
-            self.afficher_instructions(selected_unit,moving=True)
             while not has_acted:
                 # Important: cette boucle permet de gérer les événements Pygame
                 for event in pygame.event.get():
@@ -243,7 +241,6 @@ class Game:
                             
                         selected_unit.competences[sel].is_selected = True
                         self.flip_display(moving=True)
-                        self.afficher_instructions(selected_unit,moving=True)
                             
                         # Attaque (touche espace) met fin au tour  
                         if event.key == pygame.K_SPACE:
@@ -361,14 +358,19 @@ class Game:
         background = pygame.transform.scale(background, (WIDTH, HEIGHT)) 
         self.screen.blit(background,(0,0)) 
         
+        # Affiche les instructions :          
+        for unit in self.player_units:
+            if unit.is_selected == True:
+                selected_unit = unit
+                break
+        self.afficher_instructions(selected_unit,viser_mode,moving)
         for case in self.cases :
             case.draw(self.screen)       
         
         # Affiche les unités
         for unit in self.player_units + self.enemy_units:
             unit.draw(self.screen)
-
-
+            
         if(moving):
             self.screen.blit(self.aim_surface, (0, 0))
             
