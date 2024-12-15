@@ -119,6 +119,12 @@ class UnitSelectionScreen(InterfaceBase):
         while True:
             self.screen.blit(self.background_image, (0, 0))
 
+            selected_text = f"Unités sélectionnées {len(selected_units)}/{num_units_to_select}"
+            text_surface = self.font.render(selected_text, True, WHITE)
+            text_rect = text_surface.get_rect(center=(WIDTH // 2, HEIGHT // 4 - 40))  # Position centrée
+            self.screen.blit(text_surface, text_rect)
+
+
             # Afficher les icônes des unités sélectionnées
             total_width = len(selected_units) * 120  # Largeur totale (100px pour l'icône + 20px d'espacement)
             start_x = (WIDTH - total_width) // 2  # Calcul pour centrer horizontalement

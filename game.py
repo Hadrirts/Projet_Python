@@ -241,6 +241,10 @@ class Game:
                     # Gestion des touches du clavier
                     if event.type == pygame.KEYDOWN:
 
+                         # Pause du jeu
+                        if event.key == pygame.K_p:
+                            self.display_pause_screen()
+
                         # Déplacement (touches fléchées)
                         dx, dy = 0, 0
                         if event.key == pygame.K_LEFT:
@@ -303,6 +307,41 @@ class Game:
             # Décrémenter les cooldowns des compétences de l'unité
             for comp in selected_unit.competences:
                 comp.decrement_cooldown()
+    def display_pause_screen(self):
+        """Affiche un écran de pause."""
+        paused = True
+        font_large = pygame.font.Font(None, 72)
+        font_small = pygame.font.Font(None, 36)
+
+        while paused:
+            #self.screen.fill((0, 0, 0))  # Remplir l'écran avec une couleur sombre
+
+            # Charger l'image de fond 
+            pause_background = pygame.image.load("sol.png")
+            pause_background = pygame.transform.scale(pause_background, (WIDTH, HEIGHT))
+
+            # Dans la méthode d'affichage de la pause
+            self.screen.blit(pause_background, (0, 0))  # Dessiner l'image en arrière-plan
+
+            # Texte "Pause"
+            text_surface = font_large.render("Pause", True, WHITE)
+            text_rect = text_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 50))
+            self.screen.blit(text_surface, text_rect)
+
+            # Instructions pour reprendre
+            instruction_surface = font_small.render("Appuyez sur R pour reprendre", True, GREY)
+            instruction_rect = instruction_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 50))
+            self.screen.blit(instruction_surface, instruction_rect)
+
+            pygame.display.flip()
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_r:  # Reprendre avec 'R'
+                        paused = False
 
     def handle_enemy_turn(self):
         """IA améliorée pour les ennemis."""
@@ -541,6 +580,9 @@ def main():
     pygame.mixer.music.load("son_interface.mp3")
     pygame.mixer.music.play(-1)
     pygame.mixer.music.set_volume(0.5)
+    #pygame.mixer.music.set_volume(1.0)  # Volume maximum
+
+
     
     # Initialisation du jeu
     screen = pygame.display.set_mode((WIDTH, HEIGHT+50))
