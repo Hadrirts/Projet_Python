@@ -60,11 +60,11 @@ class BouleDeFeu(Competence):
         return affected_units
     
 class Poing(Competence):
-    def __init__(self):
-        super().__init__(nom="Coup de Poing", degats=7, portee=1, cooldown=0)
+    def __init__(self,degats):
+        super().__init__(nom="Coup de Poing", portee=1, cooldown=0,degats=degats)
         self.zone_type = "zone"
         self.image = pygame.image.load("poing.png")
-        self.description = "Frappe les ennemis à proximité"
+        self.description = "Frappe les ennemis proches"
 
     def utiliser(self, caster, enemy_units):
         """Utilise le Coup de Poing pour infliger des dégâts dans un rayon autour du caster."""
@@ -137,7 +137,7 @@ class Tir(Competence):
     
 class Soin(Competence):
     def __init__(self):
-        super().__init__(nom="Soin", degats=-10, portee=1, cooldown=2)
+        super().__init__(nom="Soin", degats=-50, portee=1, cooldown=2)
         self.zone_type = "zone"
         self.image = pygame.image.load("soin.png")
         self.description = "Soigne les unités à proximité"

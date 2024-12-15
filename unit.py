@@ -147,36 +147,36 @@ class Unit:
             screen.blit(picture,(pos_x,pos_y))   
 
 class Guerrier(Unit):
-    def __init__(self, x=0, y=0, health=100, attack_power=20, defense=10, speed=5, team='player'):
+    def __init__(self, x=0, y=0, health=100, attack_power=30, defense=10, speed=5, team='player'):
         super().__init__(x, y, health, attack_power, defense, speed, team)
         picture = "guerrier.png"
         self.image = pygame.image.load(picture)
         self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE)) 
-        self.competences = [Poing(),Spin()]
+        self.competences = [Poing(degats=attack_power),Spin()]
         
 class Archer(Unit):
-    def __init__(self, x=0, y=0, health=80, attack_power=15, defense=5, speed=6, team='player'):
+    def __init__(self, x=0, y=0, health=80, attack_power=20, defense=5, speed=6, team='player'):
         super().__init__(x, y, health, attack_power, defense, speed, team)
         picture = "archer.png"
         self.image = pygame.image.load(picture)
         self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE)) 
-        self.competences = [Poing(),Tir()]
+        self.competences = [Poing(degats=attack_power),Tir()]
 
 class Mage(Unit):
-    def __init__(self, x=0, y=0, health=60, attack_power=25, defense=3, speed=6, team='player'):
+    def __init__(self, x=0, y=0, health=60, attack_power=15, defense=3, speed=6, team='player'):
         super().__init__(x, y, health, attack_power, defense, speed, team)
         picture = "mage.png"
         self.image = pygame.image.load(picture)
         self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE)) 
-        self.competences = [Poing(),BouleDeFeu()]
+        self.competences = [Poing(degats=attack_power),BouleDeFeu()]
 
 class Paladin(Unit):
-    def __init__(self, x=0, y=0, health=120, attack_power=18, defense=15, speed=4, team='player'):
+    def __init__(self, x=0, y=0, health=120, attack_power=25, defense=15, speed=4, team='player'):
         super().__init__(x, y, health, attack_power, defense, speed, team)
         picture = "paladin.png"
         self.image = pygame.image.load(picture)
         self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE)) # redimensionner l'image
-        self.competences = [Poing(),Soin()]
+        self.competences = [Poing(degats=attack_power),Soin()]
 
 class Monstre(Unit):
     def __init__(self, x=0, y=0, health=150, attack_power=30, defense=8, speed=10, monstre="monstre 1", team='enemy'):
@@ -189,7 +189,7 @@ class Monstre(Unit):
             picture = "monstre3.png"
         self.image = pygame.image.load(picture)
         self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE)) # redimensionner l'image
-        self.competences = [Poing()]
+        self.competences = [Poing(degats=attack_power)]
         
 import heapq
 

@@ -78,9 +78,9 @@ class Game:
         self.player_units = [] # à choisir dans l'interface
 
         self.enemy_units = [
-            Monstre(GRID_SIZE-1, GRID_SIZE-1, health=30, attack_power=30, defense=8, speed=2, monstre="monstre 1", team='enemy'),
-            Monstre(GRID_SIZE-2, GRID_SIZE-1, health=30, attack_power=30, defense=8, speed=2, monstre="monstre 2", team='enemy'),
-            Monstre(GRID_SIZE-3, GRID_SIZE-1, health=30, attack_power=30, defense=8, speed=2, monstre="monstre 3", team='enemy')
+            Monstre(GRID_SIZE-1, GRID_SIZE-1, health=150, attack_power=30, defense=8, speed=2, monstre="monstre 1", team='enemy'),
+            Monstre(GRID_SIZE-2, GRID_SIZE-1, health=150, attack_power=30, defense=8, speed=2, monstre="monstre 2", team='enemy'),
+            Monstre(GRID_SIZE-3, GRID_SIZE-1, health=150, attack_power=30, defense=8, speed=2, monstre="monstre 3", team='enemy')
         ]
         
         # Coordonnées des cases spéciales et objets
