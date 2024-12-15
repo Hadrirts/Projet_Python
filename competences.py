@@ -33,6 +33,7 @@ class BouleDeFeu(Competence):
         self.zone_type = "cercle"
         self.rayon = 1
         self.image = pygame.image.load("feu.png")
+        self.description = "Lance une boule de feu"
 
     def utiliser(self, caster, x, y, enemy_units):
         """Utilise la boule de feu, affectant une zone circulaire autour de la cible."""
@@ -58,6 +59,7 @@ class Tir(Competence):
         super().__init__(nom="Tir", degats=10, portee=3, cooldown=3)
         self.zone_type = "ligne"
         self.image = pygame.image.load("arc.png")
+        self.description = "Tire une flèche"
         
     def utiliser(self, caster, enemy_units, direction_active):
         """
@@ -106,6 +108,7 @@ class Soin(Competence):
         super().__init__(nom="Soin", degats=-10, portee=1, cooldown=2)
         self.zone_type = "zone"
         self.image = pygame.image.load("soin.png")
+        self.description = "Soigne les unités à proximité"
 
     def get_allies_in_cercle(self, caster, player_units):
         """Retourne les unités dans une zone circulaire autour du caster."""
@@ -129,6 +132,7 @@ class Spin(Competence):
         super().__init__(nom="Spin", degats=20, portee=3, cooldown=2)
         self.zone_type = "zone"
         self.image = pygame.image.load("epee.png")
+        self.description = "Attaque les ennemis à proximité"
 
     def utiliser(self, caster, enemy_units):
         """Utilise le Spin pour infliger des dégâts dans un rayon autour du caster."""

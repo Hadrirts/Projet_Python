@@ -99,10 +99,7 @@ class Game:
         lave = [Lave(i,j,self) for i,j, in lave_coord]
         guerison = [Guerison(i,j,self) for i,j in guerison_coord]
         self.mur = [Mur(i,j,self) for i,j in mur_coord]
-        objets = [Feu(11,1,self),Arc(1,11,self),Med(6,3,self),Epee(6,9,self)]
-        
-        # objet_coord = 
-        
+        objets = [Feu(11,1,self),Arc(1,11,self),Med(6,3,self),Epee(6,9,self)]    
         self.cases = lave+self.mur+guerison+objets
 
         self.aim_surface = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
@@ -368,6 +365,10 @@ class Game:
                         enemy.move(dx, dy, self.mur)
                         self.flip_display()
                         pygame.time.wait(200)
+                        # Gestion des effets des cases spéciales
+                        for case in self.cases:
+                            if case.rect.collidepoint(enemy.x * CELL_SIZE, enemy.y * CELL_SIZE) and not(isinstance(case,Objet)):  # Si l'unité est dans une case spéciale
+                                case.effect(enemy,self.cases) # Applique les effets de la case
 
 
             # 4. Utiliser une compétence ou attaquer
@@ -435,16 +436,7 @@ class Game:
             text_rect = text_surface.get_rect()
             text_rect.bottomleft = barre_rect.bottomright
             self.screen.blit(text_surface, text_rect)
-            
-            # Afficher les cooldowns à droite
-            # cooldown_x = WIDTH - 150
-            # for i, comp in enumerate(unit.competences):
-            #     cooldown_text = f"{comp.nom}: disponible dans {comp.current_cooldown}tours" if comp.current_cooldown > 0 else f"{comp.nom}: Ready"
-            #     cooldown_surface = font.render(cooldown_text, True, WHITE)
-            #     cooldown_rect = cooldown_surface.get_rect()
-            #     cooldown_rect.topleft = (cooldown_x, HEIGHT + 5 + i * 20)
-            #     self.screen.blit(cooldown_surface, cooldown_rect)
-            
+
         if viser_mode:
             for c in unit.competences :
                 if (c.is_selected == True) and (type(c) in [BouleDeFeu,Tir]):
@@ -489,14 +481,14 @@ class Game:
             if c.is_selected == True:
                 
                 font = pygame.font.Font(None, 15)
-                text_surface = font.render(c.nom + ": " + "c.description", True, WHITE)  # Afficher la compétence sélectionnée et sa description
+                text_surface = font.render(c.nom + ": " + c.description, True, WHITE)  # Afficher la compétence sélectionnée et sa description
                 text_rect = text_surface.get_rect()
                 text_rect.top = txt_rect.bottom+5
                 text_rect.centerx = txt_rect.centerx
                 self.screen.blit(text_surface, text_rect)
             
-                cooldown_text = f"disponible dans {c.current_cooldown}tours" if c.current_cooldown > 0 else f"Ready"
-                cooldown_surface = font.render(cooldown_text, True, WHITE)
+                cooldown_text,color = (f"disponible dans {c.current_cooldown} tour.s",D_GREY) if c.current_cooldown > 0 else (f"Ready",GREEN)
+                cooldown_surface = font.render(cooldown_text, True, color)
                 cooldown_rect = cooldown_surface.get_rect()
                 cooldown_rect.centerx = text_rect.centerx
                 cooldown_rect.top = text_rect.bottom
@@ -510,6 +502,19 @@ class Game:
                 self.screen.blit(comp,comp_rect)
                 
                 break
+                    
+        p = pygame.image.load("p.png")  # Affichage de la touche 'p'
+        p = pygame.transform.scale(p, (15, 15))
+        p_rect = p.get_rect()
+        p_rect.bottom = fleches_rect.bottom
+        p_rect.left = fleches_rect.left + 100
+        self.screen.blit(p,p_rect) 
+        
+        font = pygame.font.Font(None, 15)
+        text_surface = font.render("Pause", True, WHITE)  # Afficher la compétence sélectionnée et sa description
+        text_rect = text_surface.get_rect()
+        text_rect.bottomleft = p_rect.bottomright
+        self.screen.blit(text_surface, text_rect)
 
     def flip_display(self, viser_mode=False, moving=False):
         """Affiche le jeu."""

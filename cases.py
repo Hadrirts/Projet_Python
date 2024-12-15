@@ -8,7 +8,7 @@ from competences import *
 def rand_coord(grid_size,nb_cases,coord_list):
     
     """
-    Fonction qui oermet de générer des coordonnées de cases aléatoires non occupées
+    Fonction qui permet de générer des coordonnées aléatoires de cases non occupées
     
     -----
     INPUT :
@@ -20,10 +20,9 @@ def rand_coord(grid_size,nb_cases,coord_list):
             Liste des coordonnées des cases déjà occupées
     OUTPUT:
         coord : list[list[int][2]]
-            Liste des coordonnées de cases libres générées
+            Liste de coordonnées de cases libres générées
     """
-    coord = []
-    
+    coord = []  
     min_val = 0
     max_val = grid_size-1
     for i in range(nb_cases):
@@ -104,11 +103,13 @@ class Lave(Case):
                    dy = random.choice([-1,0,1])
                 safe = True
                 for case in cases:
-                    # Eviter que l'unité aterrisse dans une autre case spéciale ou en dehors du jeu
-                    if case.rect.collidepoint((unit.x+dx) * CELL_SIZE, (unit.y+dy) * CELL_SIZE) or not(0 <= unit.x + dx < GRID_SIZE) or not(0 <= unit.y + dy < GRID_SIZE): 
+                    # Eviter que l'unité aterrisse dans une autre case spéciale ou en dehors de sa zone de mouvement
+                    if (case.rect.collidepoint((unit.x+dx) * CELL_SIZE, (unit.y+dy) * CELL_SIZE) or 
+                    not(0 <= unit.x + dx < GRID_SIZE) or not(0 <= unit.y + dy < GRID_SIZE) or
+                    ((unit.x+dx,unit.y+dy) not in unit.cases_acces)): 
                         safe = False
                         break  # Sortir de la boucle for et chercher une autre case
-                    
+
                 if safe == True: # Si la case est libre
                     break  # Sortir de la boucle while pour faire bouger l'unité
                 
@@ -120,6 +121,7 @@ class Lave(Case):
                     murs.append(case)
             unit.move(dx, dy, murs)   # Déplacement
             unit.health -= self.degats # Se brûle -> Perd 5 PV
+            print(unit.team+" unit in lava")
             self.Game.flip_display(moving=True)
             
             if  unit.health <= 0:                # Si l'unité a perdu tout ses PV
@@ -148,8 +150,7 @@ class Guerison(Case):
             # else :
             #     unit.health += self.__healing   # Guérit -> Gagne PV
                 
-            print(f"Healed, PV : {unit.health_max}")
-            print("-----------------------------")
+            print(unit.team+" unit healed")
             
             cases.remove(self) # faire disparaître la case
             self.Game.flip_display()

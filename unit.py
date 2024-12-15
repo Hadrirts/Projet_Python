@@ -190,6 +190,7 @@ class Monstre(Unit):
         self.image = pygame.image.load(picture)
         self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE)) # redimensionner l'image
         self.competences = [Tir()]
+        
 import heapq
 
 def astar(start, goal, grid, walls):
