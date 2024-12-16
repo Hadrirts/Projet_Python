@@ -34,7 +34,7 @@ class Competence(ABC):
 
 class BouleDeFeu(Competence):
     def __init__(self):
-        super().__init__(nom="Boule de feu", degats=10, portee=3, cooldown=3)
+        super().__init__(nom="Boule de feu", degats=40, portee=3, cooldown=3)
         self.zone_type = "cercle"
         self.rayon = 1
         self.image = pygame.image.load("feu.png")
@@ -88,7 +88,7 @@ class Poing(Competence):
     
 class Tir(Competence):
     def __init__(self):
-        super().__init__(nom="Tir", degats=10, portee=3, cooldown=3)
+        super().__init__(nom="Tir", degats=30, portee=3, cooldown=3)
         self.zone_type = "ligne"
         self.image = pygame.image.load("arc.png")
         self.description = "Tire une flèche"
@@ -137,7 +137,7 @@ class Tir(Competence):
     
 class Soin(Competence):
     def __init__(self):
-        super().__init__(nom="Soin", degats=-50, portee=1, cooldown=2)
+        super().__init__(nom="Soin", degats=-25, portee=1, cooldown=2)
         self.zone_type = "zone"
         self.image = pygame.image.load("soin.png")
         self.description = "Soigne les unités à proximité"
@@ -161,7 +161,7 @@ class Soin(Competence):
     
 class Spin(Competence):
     def __init__(self):
-        super().__init__(nom="Spin", degats=20, portee=3, cooldown=2)
+        super().__init__(nom="Spin", degats=45, portee=3, cooldown=2)
         self.zone_type = "zone"
         self.image = pygame.image.load("epee.png")
         self.description = "Attaque les ennemis autour"
